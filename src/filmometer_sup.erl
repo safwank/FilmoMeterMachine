@@ -50,7 +50,7 @@ init([]) ->
     WebConfig = [
                  {ip, Ip},
                  {port, Port},
-                 {log_dir, "priv/log"},
+                 %{log_dir, "priv/log"},
                  {dispatch, Dispatch}],
     Web = {webmachine_mochiweb,
            {webmachine_mochiweb, start, [WebConfig]},
