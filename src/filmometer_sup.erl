@@ -48,8 +48,8 @@ init([]) ->
     Port = list_to_integer(os:getenv("PORT")),
     io:format("start web server on port ~p~n", [Port]),
     WebConfig = [
-                 {ip, Ip},
-                 {port, Port},
+                 {ip, "0.0.0.0"},
+                 {port, 80},
                  %{log_dir, "priv/log"},
                  {dispatch, Dispatch}],
     Web = {webmachine_mochiweb,
