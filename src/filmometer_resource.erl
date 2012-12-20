@@ -1,5 +1,5 @@
-%% @author author <author@example.com>
-%% @copyright YYYY author.
+%% @author Safwan Kamarrudin <shaihulud@alumni.cmu.edu>
+%% @copyright 2012 Safwan Kamarrudin.
 %% @doc Example webmachine_resource.
 
 -module(filmometer_resource).
