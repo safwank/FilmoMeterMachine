@@ -41,12 +41,20 @@ upgrade() ->
 %% @spec init([]) -> SupervisorTree
 %% @doc supervisor callback.
 init([]) ->
-    Ip = case os:getenv("WEBMACHINE_IP") of false -> "0.0.0.0"; Any -> Any end,
+    Ip = case os:getenv("WEBMACHINE_IP") of 
+            false -> "0.0.0.0"; 
+            AnyIp -> AnyIp
+         end,
+
     {ok, Dispatch} = file:consult(filename:join(
                           [filename:dirname(code:which(?MODULE)),
                           "..", "priv", "dispatch.conf"])),
 
-    Port = list_to_integer(os:getenv("PORT")),
+    Port = case os:getenv("PORT") of
+              false -> 8000;
+              AnyPort -> list_to_integer(AnyPort)
+           end,
+
     io:format("start web server on port ~p~n", [Port]),
     WebConfig = [
                  {ip, Ip},
