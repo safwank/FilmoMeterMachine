@@ -16,14 +16,28 @@ content_types_provided(ReqData, Context) ->
 to_json(ReqData, Context) ->
     Title = wrq:get_qs_value("title", ReqData),
     OMDBResult = get_omdb_result(Title),
-    {{_Version, 200, _ReasonPhrase}, _Headers, Body} = OMDBResult,
-    {Body, ReqData, Context}.
+    %TomatoesResult = get_tomatoes_result(Title),
+    {OMDBResult, ReqData, Context}.
 
 get_omdb_result(Title) ->
 	EncodedTitle = mochiweb_util:urlencode([{"t", Title}]),
     RequestUri = string:concat("http://www.omdbapi.com/?", EncodedTitle),
     {ok, RequestId} = httpc:request(get, {RequestUri, []}, [], [{sync, false}]),
-    wait_for_response(RequestId).
+    Result = wait_for_response(RequestId),
+    {{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
+    ParsedJsonResult = mochijson:decode(Body),
+    {_,[_Title,Year,_Rated,_Released,_Runtime,_Genre,_Director,_Writer,Actors,_Plot,Poster,{_,Rating},_Votes,_ID,_Response]} = ParsedJsonResult,
+    mochijson:encode({struct,[_Title,Year,Actors,Poster,{"Rating",Rating}]}).
+
+get_tomatoes_result(Title) ->
+	APIKey = "b2x78beenefg6tq3ynr56r4a",
+	PageLimit = 5,
+	EncodedTitle = mochiweb_util:urlencode([{"q", Title}]),
+	RequestUri = lists:flatten(
+				 	io_lib:format("http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=~s&page_limit=~p&~s", 
+						          [APIKey, PageLimit, EncodedTitle])),
+	{ok, RequestId} = httpc:request(get, {RequestUri, []}, [], [{sync, false}]),
+	Result = wait_for_response(RequestId).
 
  wait_for_response(RequestId) ->
  	receive 
