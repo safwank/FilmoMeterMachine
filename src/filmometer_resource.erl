@@ -15,12 +15,15 @@ content_types_provided(ReqData, Context) ->
 
 to_json(ReqData, Context) ->
     Title = wrq:get_qs_value("title", ReqData),
-    EncodedTitle = mochiweb_util:urlencode([{"t", Title}]),
+    OMDBResult = get_omdb_result(Title),
+    {{_Version, 200, _ReasonPhrase}, _Headers, Body} = OMDBResult,
+    {Body, ReqData, Context}.
+
+get_omdb_result(Title) ->
+	EncodedTitle = mochiweb_util:urlencode([{"t", Title}]),
     RequestUri = string:concat("http://www.omdbapi.com/?", EncodedTitle),
     {ok, RequestId} = httpc:request(get, {RequestUri, []}, [], [{sync, false}]),
-    Result = wait_for_response(RequestId),
-    {{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
-    {Body, ReqData, Context}.
+    wait_for_response(RequestId).
 
  wait_for_response(RequestId) ->
  	receive 
