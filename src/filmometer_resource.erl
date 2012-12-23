@@ -26,8 +26,10 @@ get_omdb_result(SearchTitle) ->
     RequestUri = string:concat("http://www.omdbapi.com/?", EncodedTitle),
     {ok, RequestId} = httpc:request(get, {RequestUri, []}, [], [{sync, false}]),
     Result = wait_for_response(RequestId),
+
     {{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
     ParsedJsonResult = mochijson:decode(Body),
+    
     {_,[Title,Year,_Rated,_Released,_Runtime,_Genre,_Director,_Writer,Actors,_Plot,Poster,{_,Rating},_Votes,_ID,_Response]} = ParsedJsonResult,
     {struct,[Title,Year,Actors,Poster,{"Rating",Rating}]}.
 
@@ -40,14 +42,23 @@ get_tomatoes_result(SearchTitle) ->
 						          [APIKey, PageLimit, EncodedTitle])),
 	{ok, RequestId} = httpc:request(get, {RequestUri, []}, [], [{sync, false}]),
 	Result = wait_for_response(RequestId),
+
 	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
 	ParsedJsonResult = mochijson:decode(Body),
 	{struct,[_Total,{_Movies,{array,[{struct,Movie}]}},_Links,_LinkTemplate]} = ParsedJsonResult,
-	[_Id,{_,Title},{_,Year},_Rating,_Runtime,_Consensus,_ReleaseDates,{_Ratings,{struct,[_,{_,CriticsScore},_,{_,AudienceScore}]}},_Synopsis,{_,Posters},{_,AbridgedCast},_AlternateIDs,_Links2] = Movie,
-	AverageRating = (CriticsScore + AudienceScore) / 2 / 10,
-	{struct,[{"Title",Title},{"Year",Year},{"Actors",AbridgedCast},{"Posters",Posters},{"Rating",AverageRating}]}.
 
-combine_results([OMDBResult,TomatoesResult]) ->
+	Title = proplists:get_value("title", Movie),
+	Year = proplists:get_value("year", Movie),
+	Actors = proplists:get_value("abridged_cast", Movie),
+	Posters = proplists:get_value("posters", Movie),
+	RatingsStruct = proplists:get_value("ratings", Movie),
+	{struct,Ratings} = RatingsStruct,
+	CriticsScore = proplists:get_value("critics_score", Ratings),
+	AudienceScore = proplists:get_value("audience_score", Ratings),
+	AverageRating = (CriticsScore + AudienceScore) / 2 / 10,
+	{struct,[{"Title",Title},{"Year",Year},{"Actors",Actors},{"Posters",Posters},{"Rating",AverageRating}]}.
+
+combine_results([OMDBResult, TomatoesResult]) ->
 	{_,[_,_,_,_,{_,OMDBRating}]} = OMDBResult,
     {ConvertedOMDBRating,_} = string:to_float(OMDBRating),
     {_,[_,_,_,_,{_,TomatoesRating}]} = TomatoesResult,
@@ -60,3 +71,14 @@ combine_results([OMDBResult,TomatoesResult]) ->
  	after 
  		5000 -> timeout 
  	end.
+
+filter_list(Pattern, List) ->
+	Eval = fun(S) -> 
+		   	   {ok, T, _} = erl_scan:string(S), 
+		   	   {ok,[A]} = erl_parse:parse_exprs(T), 
+		   	   {value, V, _} = erl_eval:expr(A,[]), V 
+		   end,
+	FilterGen = fun(X) -> 
+					Eval(lists:flatten(["fun(",X,")->true;(_)->false end."])) 
+				end,
+	lists:filter(FilterGen(Pattern),List).
