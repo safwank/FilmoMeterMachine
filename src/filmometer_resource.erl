@@ -46,7 +46,9 @@ get_tomatoes_result(SearchTitle) ->
 	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
 	ParsedJsonResult = mochijson:decode(Body),
 	{struct,[_Total,{_Movies,{array,[{struct,Movie}]}},_Links,_LinkTemplate]} = ParsedJsonResult,
+	build_tomatoes_result_from(Movie).
 
+build_tomatoes_result_from(Movie) ->
 	Title = proplists:get_value("title", Movie),
 	Year = proplists:get_value("year", Movie),
 	Actors = proplists:get_value("abridged_cast", Movie),
