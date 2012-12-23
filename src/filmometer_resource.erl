@@ -63,7 +63,7 @@ combine_results([OMDBResult, TomatoesResult]) ->
     {ConvertedOMDBRating,_} = string:to_float(OMDBRating),
     {_,[_,_,_,_,{_,TomatoesRating}]} = TomatoesResult,
     AverageRating = (ConvertedOMDBRating + TomatoesRating) / 2,
-    {array,[{struct,[{"AverageRating", AverageRating}]},OMDBResult,TomatoesResult]}.
+    {array,[{struct,[{"AverageRating", round_rating(AverageRating)}]},OMDBResult,TomatoesResult]}.
 
  wait_for_response(RequestId) ->
  	receive 
@@ -71,6 +71,10 @@ combine_results([OMDBResult, TomatoesResult]) ->
  	after 
  		5000 -> timeout 
  	end.
+
+round_rating(Rating) ->
+	[RoundedRating] = io_lib:format("~.2f", [Rating]),
+	RoundedRating.
 
 filter_list(Pattern, List) ->
 	Eval = fun(S) -> 
