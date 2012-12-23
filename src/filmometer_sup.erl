@@ -4,7 +4,7 @@
 %% @doc Supervisor for the filmometer application.
 
 -module(filmometer_sup).
--author('author <author@example.com>').
+-author('Safwan Kamarrudin <shaihulud@alumni.cmu.edu>').
 
 -behaviour(supervisor).
 

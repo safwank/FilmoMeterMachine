@@ -16,10 +16,10 @@ content_types_provided(ReqData, Context) ->
 to_json(ReqData, Context) ->
     Title = wrq:get_qs_value("title", ReqData),
     OMDBResult = get_omdb_result(Title),
-    erlang:display(OMDBResult),
     TomatoesResult = get_tomatoes_result(Title),
-    erlang:display(TomatoesResult),
-    {TomatoesResult, ReqData, Context}.
+    CombinedResult = combine_results([OMDBResult,TomatoesResult]),
+    EncodedCombinedResult = mochijson:encode(CombinedResult),
+    {EncodedCombinedResult, ReqData, Context}.
 
 get_omdb_result(SearchTitle) ->
 	EncodedTitle = mochiweb_util:urlencode([{"t", SearchTitle}]),
@@ -29,7 +29,7 @@ get_omdb_result(SearchTitle) ->
     {{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
     ParsedJsonResult = mochijson:decode(Body),
     {_,[Title,Year,_Rated,_Released,_Runtime,_Genre,_Director,_Writer,Actors,_Plot,Poster,{_,Rating},_Votes,_ID,_Response]} = ParsedJsonResult,
-    mochijson:encode({struct,[Title,Year,Actors,Poster,{"Rating",Rating}]}).
+    {struct,[Title,Year,Actors,Poster,{"Rating",Rating}]}.
 
 get_tomatoes_result(SearchTitle) ->
 	APIKey = "b2x78beenefg6tq3ynr56r4a",
@@ -43,9 +43,16 @@ get_tomatoes_result(SearchTitle) ->
 	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
 	ParsedJsonResult = mochijson:decode(Body),
 	{struct,[_Total,{_Movies,{array,[{struct,Movie}]}},_Links,_LinkTemplate]} = ParsedJsonResult,
-	[_Id,Title,Year,_Rating,_Runtime,_Consensus,_ReleaseDates,{_Ratings,{struct,[_,{_,CriticsScore},_,{_,AudienceScore}]}},_Synopsis,Posters,AbridgedCast,_AlternateIDs,_Links2] = Movie,
+	[_Id,{_,Title},{_,Year},_Rating,_Runtime,_Consensus,_ReleaseDates,{_Ratings,{struct,[_,{_,CriticsScore},_,{_,AudienceScore}]}},_Synopsis,{_,Posters},{_,AbridgedCast},_AlternateIDs,_Links2] = Movie,
 	AverageRating = (CriticsScore + AudienceScore) / 2 / 10,
-	mochijson:encode({struct,[Title,Year,AbridgedCast,Posters,{"Rating",AverageRating}]}).
+	{struct,[{"Title",Title},{"Year",Year},{"Actors",AbridgedCast},{"Posters",Posters},{"Rating",AverageRating}]}.
+
+combine_results([OMDBResult,TomatoesResult]) ->
+	{_,[_,_,_,_,{_,OMDBRating}]} = OMDBResult,
+    {ConvertedOMDBRating,_} = string:to_float(OMDBRating),
+    {_,[_,_,_,_,{_,TomatoesRating}]} = TomatoesResult,
+    AverageRating = (ConvertedOMDBRating + TomatoesRating) / 2,
+    {array,[{struct,[{"AverageRating", AverageRating}]},OMDBResult,TomatoesResult]}.
 
  wait_for_response(RequestId) ->
  	receive 
