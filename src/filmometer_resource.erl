@@ -24,9 +24,9 @@ to_json(ReqData, Context) ->
 get_results_for(Title) ->
 	%% TODO: Figure out how to retrieve results from a dynamic list of sources
     OMDBResult = get_omdb_result(Title),
-    TomatoesResult = get_tomatoes_result(Title),
+    FlixsterResult = get_flixster_result(Title),
     TMDBResult = get_tmdb_result(Title),
-    OMDBResult++TomatoesResult++TMDBResult.
+    OMDBResult++FlixsterResult++TMDBResult.
 
 get_omdb_result(SearchTitle) ->
 	EncodedTitle = mochiweb_util:urlencode([{"t", SearchTitle}]),
@@ -41,7 +41,7 @@ get_omdb_result(SearchTitle) ->
     {ConvertedRating,_} = string:to_float(Rating),
     [#movie{title=Title,year=Year,actors=Actors,poster=Poster,rating=ConvertedRating}].
 
-get_tomatoes_result(SearchTitle) ->
+get_flixster_result(SearchTitle) ->
 	APIKey = "b2x78beenefg6tq3ynr56r4a",
 	PageLimit = 1,
 	EncodedTitle = mochiweb_util:urlencode([{"q", SearchTitle}]),
@@ -54,9 +54,9 @@ get_tomatoes_result(SearchTitle) ->
 	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
 	ParsedJsonResult = mochijson:decode(Body),
 	{struct,[_Total,{_Movies,{array,[{struct,Movie}]}},_Links,_LinkTemplate]} = ParsedJsonResult,
-	build_tomatoes_result_from(Movie).
+	build_flixster_result_from(Movie).
 
-build_tomatoes_result_from(Movie) ->
+build_flixster_result_from(Movie) ->
 	Title = proplists:get_value("title", Movie),
 	Year = proplists:get_value("year", Movie),
 
