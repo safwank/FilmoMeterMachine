@@ -15,7 +15,7 @@ content_types_provided(ReqData, Context) ->
 
 to_json(ReqData, Context) ->
     Title = wrq:get_qs_value("title", ReqData),
-    %%TODO: Figure out how to retrieve results from a dynamic list of sources
+    %% TODO: Figure out how to retrieve results from a dynamic list of sources
     OMDBResult = get_omdb_result(Title),
     TomatoesResult = get_tomatoes_result(Title),
     TMDBResult = get_tmdb_result(Title),
@@ -81,7 +81,7 @@ get_tmdb_result(SearchTitle) ->
 	[{struct,[{"Title",Title},{"Year",Year},{"Actors",""},{"Poster",Poster},{"Rating",Rating}]}].
 
 combine_results([OMDBResult, TomatoesResult, TMDBResult]) ->
-	%%TODO: Use records instead!
+	%% TODO: Use records instead!
 	{_,[_,_,_,_,{_,OMDBRating}]} = OMDBResult,
 
     {ConvertedOMDBRating,_} = string:to_float(OMDBRating),
@@ -99,6 +99,8 @@ combine_results([OMDBResult, TomatoesResult, TMDBResult]) ->
  		5000 -> timeout 
  	end.
 
+%% Utility functions (considering moving them elsewhere)
+
 round_rating(Rating) ->
 	[RoundedRating] = io_lib:format("~.2f", [Rating]),
 	RoundedRating.
@@ -113,3 +115,11 @@ filter_list(Pattern, List) ->
 					Eval(lists:flatten(["fun(",X,")->true;(_)->false end."])) 
 				end,
 	lists:filter(FilterGen(Pattern),List).
+
+average(Numbers) ->
+        average(Numbers, 0, 0).
+
+average([H|T], Length, Sum) ->
+        average(T, Length + 1, Sum + H);
+average([], Length, Sum) ->
+        Sum / Length.
