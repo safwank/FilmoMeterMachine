@@ -17,6 +17,7 @@ content_types_provided(ReqData, Context) ->
 
 to_json(ReqData, Context) ->
     Title = wrq:get_qs_value("title", ReqData),
+    %% TODO: Include year
     Results = get_results_for(Title),
     CombinedResult = combine_results(Results),
     {CombinedResult, ReqData, Context}.
@@ -43,7 +44,7 @@ get_omdb_result(SearchTitle) ->
 
 get_flixster_result(SearchTitle) ->
 	APIKey = "b2x78beenefg6tq3ynr56r4a",
-	PageLimit = 1,
+	PageLimit = 3,
 	EncodedTitle = mochiweb_util:urlencode([{"q", SearchTitle}]),
 	RequestUri = lists:flatten(
 				 	io_lib:format("http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=~s&page_limit=~p&~s", 
@@ -53,26 +54,34 @@ get_flixster_result(SearchTitle) ->
 
 	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
 	ParsedJsonResult = mochijson:decode(Body),
-	{struct,[_Total,{_Movies,{array,[{struct,Movie}]}},_Links,_LinkTemplate]} = ParsedJsonResult,
-	build_flixster_result_from(Movie).
+	{struct, [_Total, {_Movies, {array, Movies}}, _Links, _LinkTemplate]} = ParsedJsonResult,
+	build_flixster_result_from(Movies).
 
-build_flixster_result_from(Movie) ->
-	Title = proplists:get_value("title", Movie),
-	Year = proplists:get_value("year", Movie),
+build_flixster_result_from(Movies) ->
+	CreateMovieFun = 
+		fun(MovieStruct, MovieAcc) ->
+			{struct, Movie} = MovieStruct,
+			Title = proplists:get_value("title", Movie),
+			Year = proplists:get_value("year", Movie),
 
-	{array, AbridgedCast} = proplists:get_value("abridged_cast", Movie),
-	Actors = [Actor || {struct,[{_,Actor}|_]} <- AbridgedCast],
-	CombinedActors = string:join(Actors, ", "),
+			{array, AbridgedCast} = proplists:get_value("abridged_cast", Movie),
+			Actors = [Actor || {struct,[{_,Actor}|_]} <- AbridgedCast],
+			CombinedActors = string:join(Actors, ", "),
 
-	{struct, Posters} = proplists:get_value("posters", Movie),
-	OriginalPoster = proplists:get_value("original", Posters),
+			{struct, Posters} = proplists:get_value("posters", Movie),
+			OriginalPoster = proplists:get_value("original", Posters),
 
-	{struct, Ratings} = proplists:get_value("ratings", Movie),
-	CriticsScore = proplists:get_value("critics_score", Ratings),
-	AudienceScore = proplists:get_value("audience_score", Ratings),
-	AverageRating = (CriticsScore + AudienceScore) / 2 / 10,
+			{struct, Ratings} = proplists:get_value("ratings", Movie),
+			CriticsScore = proplists:get_value("critics_score", Ratings),
+			AudienceScore = proplists:get_value("audience_score", Ratings),
+			AverageRating = (CriticsScore + AudienceScore) / 2 / 10,
 
-	[#movie{title=Title,year=Year,actors=CombinedActors,poster=OriginalPoster,rating=AverageRating}].
+			[#movie{title=Title, year=Year, actors=CombinedActors,
+					poster=OriginalPoster, rating=AverageRating}] ++ MovieAcc
+		end,
+	
+	MovieList = lists:foldl(CreateMovieFun, [], Movies),
+	MovieList.
 
 get_tmdb_result(SearchTitle) ->
 	APIKey = "8abd8211399f1196bdefef458fc4c5ed",
@@ -87,10 +96,16 @@ get_tmdb_result(SearchTitle) ->
 	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
 	ParsedJsonResult = mochijson:decode(Body),
 
-	{struct,[_Page,{_Results,{array,[FirstResult|_]}},_TotalPages,_TotalResults]} = ParsedJsonResult,
-	{struct,[_Adult,_Backdrop,_Id,_OriginalTitle,{_,ReleaseDate},{_,Poster},_Popularity,{_,Title},{_,Rating},_Votes]} = FirstResult,
-	[Year,_Month,_Day] = string:tokens(ReleaseDate,"-"),
-	[#movie{title=Title,year=Year,actors="",poster=Poster,rating=Rating}].
+	{struct, [_Page, {_Results, {array, Results}}, _TotalPages, _TotalResults]} = ParsedJsonResult,
+
+	Movies = 
+		[#movie{title=Title, year=string:substr(ReleaseDate, 1, 4), 
+				actors="", poster=Poster, rating=Rating}
+		|| {struct,[_Adult, _Backdrop, _Id, _OriginalTitle,
+					{_, ReleaseDate}, {_, Poster}, _Popularity,
+					{_, Title}, {_, Rating}, _Votes]} 
+		<- Results],
+	Movies.
 
 combine_results(Results) ->
 	Ratings = [Movie#movie.rating || Movie <- Results],
