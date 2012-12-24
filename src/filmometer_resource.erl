@@ -1,6 +1,6 @@
 %% @author Safwan Kamarrudin <shaihulud@alumni.cmu.edu>
 %% @copyright 2012 Safwan Kamarrudin.
-%% @doc Example webmachine_resource.
+%% @doc Look up movie ratings.
 
 -module(filmometer_resource).
 -export([init/1, content_types_provided/2, to_json/2]).
@@ -15,9 +15,11 @@ content_types_provided(ReqData, Context) ->
 
 to_json(ReqData, Context) ->
     Title = wrq:get_qs_value("title", ReqData),
+    %%TODO: Figure out how to retrieve results from a dynamic list of sources
     OMDBResult = get_omdb_result(Title),
     TomatoesResult = get_tomatoes_result(Title),
-    CombinedResult = combine_results([OMDBResult,TomatoesResult]),
+    TMDBResult = get_tmdb_result(Title),
+    CombinedResult = combine_results(OMDBResult++TomatoesResult++TMDBResult),
     EncodedCombinedResult = mochijson:encode(CombinedResult),
     {EncodedCombinedResult, ReqData, Context}.
 
@@ -31,7 +33,7 @@ get_omdb_result(SearchTitle) ->
     ParsedJsonResult = mochijson:decode(Body),
     
     {_,[Title,Year,_Rated,_Released,_Runtime,_Genre,_Director,_Writer,Actors,_Plot,Poster,{_,Rating},_Votes,_ID,_Response]} = ParsedJsonResult,
-    {struct,[Title,Year,Actors,Poster,{"Rating",Rating}]}.
+    [{struct,[Title,Year,Actors,Poster,{"Rating",Rating}]}].
 
 get_tomatoes_result(SearchTitle) ->
 	APIKey = "b2x78beenefg6tq3ynr56r4a",
@@ -58,14 +60,37 @@ build_tomatoes_result_from(Movie) ->
 	CriticsScore = proplists:get_value("critics_score", Ratings),
 	AudienceScore = proplists:get_value("audience_score", Ratings),
 	AverageRating = (CriticsScore + AudienceScore) / 2 / 10,
-	{struct,[{"Title",Title},{"Year",Year},{"Actors",Actors},{"Posters",Posters},{"Rating",AverageRating}]}.
+	[{struct,[{"Title",Title},{"Year",Year},{"Actors",Actors},{"Posters",Posters},{"Rating",AverageRating}]}].
 
-combine_results([OMDBResult, TomatoesResult]) ->
+get_tmdb_result(SearchTitle) ->
+	APIKey = "8abd8211399f1196bdefef458fc4c5ed",
+	EncodedTitle = mochiweb_util:urlencode([{"query", SearchTitle}]),
+	RequestUri = lists:flatten(
+				 	io_lib:format("http://api.themoviedb.org/3/search/movie?api_key=~s&~s", 
+						          [APIKey, EncodedTitle])),
+
+	{ok, RequestId} = httpc:request(get, {RequestUri, [{"Accept", "application/json"}]}, [], [{sync, false}]),
+	Result = wait_for_response(RequestId),
+
+	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
+	ParsedJsonResult = mochijson:decode(Body),
+
+	{struct,[_Page,{_Results,{array,[FirstResult|_]}},_TotalPages,_TotalResults]} = ParsedJsonResult,
+	{struct,[_Adult,_Backdrop,_Id,_OriginalTitle,{_,ReleaseDate},{_,Poster},_Popularity,{_,Title},{_,Rating},_Votes]} = FirstResult,
+	[Year,_Month,_Day] = string:tokens(ReleaseDate,"-"),
+	[{struct,[{"Title",Title},{"Year",Year},{"Actors",""},{"Poster",Poster},{"Rating",Rating}]}].
+
+combine_results([OMDBResult, TomatoesResult, TMDBResult]) ->
+	%%TODO: Use records instead!
 	{_,[_,_,_,_,{_,OMDBRating}]} = OMDBResult,
+
     {ConvertedOMDBRating,_} = string:to_float(OMDBRating),
     {_,[_,_,_,_,{_,TomatoesRating}]} = TomatoesResult,
-    AverageRating = (ConvertedOMDBRating + TomatoesRating) / 2,
-    {array,[{struct,[{"AverageRating", round_rating(AverageRating)}]},OMDBResult,TomatoesResult]}.
+
+    {_,[_,_,_,_,{_,TMDBRating}]} = TMDBResult,
+    
+    AverageRating = (ConvertedOMDBRating + TomatoesRating + TMDBRating) / 3,
+    {array,[{struct,[{"AverageRating", round_rating(AverageRating)}]},OMDBResult,TomatoesResult,TMDBResult]}.
 
  wait_for_response(RequestId) ->
  	receive 
