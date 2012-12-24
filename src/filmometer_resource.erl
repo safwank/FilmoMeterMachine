@@ -1,6 +1,6 @@
 %% @author Safwan Kamarrudin <shaihulud@alumni.cmu.edu>
 %% @copyright 2012 Safwan Kamarrudin.
-%% @doc Look up movie ratings.
+%% @doc Look up movie ratings and average them out.
 
 -module(filmometer_resource).
 -export([init/1, content_types_provided/2, to_json/2]).
@@ -59,14 +59,20 @@ get_tomatoes_result(SearchTitle) ->
 build_tomatoes_result_from(Movie) ->
 	Title = proplists:get_value("title", Movie),
 	Year = proplists:get_value("year", Movie),
-	Actors = proplists:get_value("abridged_cast", Movie),
-	Posters = proplists:get_value("posters", Movie),
-	RatingsStruct = proplists:get_value("ratings", Movie),
-	{struct,Ratings} = RatingsStruct,
+
+	{array, AbridgedCast} = proplists:get_value("abridged_cast", Movie),
+	Actors = [Actor || {struct,[{_,Actor}|_]} <- AbridgedCast],
+	CombinedActors = string:join(Actors, ", "),
+
+	{struct, Posters} = proplists:get_value("posters", Movie),
+	OriginalPoster = proplists:get_value("original", Posters),
+
+	{struct, Ratings} = proplists:get_value("ratings", Movie),
 	CriticsScore = proplists:get_value("critics_score", Ratings),
 	AudienceScore = proplists:get_value("audience_score", Ratings),
 	AverageRating = (CriticsScore + AudienceScore) / 2 / 10,
-	[#movie{title=Title,year=Year,actors=Actors,poster=Posters,rating=AverageRating}].
+
+	[#movie{title=Title,year=Year,actors=CombinedActors,poster=OriginalPoster,rating=AverageRating}].
 
 get_tmdb_result(SearchTitle) ->
 	APIKey = "8abd8211399f1196bdefef458fc4c5ed",
