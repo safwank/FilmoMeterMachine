@@ -7,6 +7,8 @@
 
 -include_lib("webmachine/include/webmachine.hrl").
 
+-record(movie, {title,year,actors,poster,rating}).
+
 init([]) -> 
 	{ok, undefined}.
 
@@ -15,12 +17,15 @@ content_types_provided(ReqData, Context) ->
 
 to_json(ReqData, Context) ->
     Title = wrq:get_qs_value("title", ReqData),
+
     %% TODO: Figure out how to retrieve results from a dynamic list of sources
     OMDBResult = get_omdb_result(Title),
     TomatoesResult = get_tomatoes_result(Title),
     TMDBResult = get_tmdb_result(Title),
+
     CombinedResult = combine_results(OMDBResult++TomatoesResult++TMDBResult),
     EncodedCombinedResult = mochijson:encode(CombinedResult),
+
     {EncodedCombinedResult, ReqData, Context}.
 
 get_omdb_result(SearchTitle) ->
@@ -32,8 +37,9 @@ get_omdb_result(SearchTitle) ->
     {{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
     ParsedJsonResult = mochijson:decode(Body),
     
-    {_,[Title,Year,_Rated,_Released,_Runtime,_Genre,_Director,_Writer,Actors,_Plot,Poster,{_,Rating},_Votes,_ID,_Response]} = ParsedJsonResult,
-    [{struct,[Title,Year,Actors,Poster,{"Rating",Rating}]}].
+    {_,[{_,Title},{_,Year},_Rated,_Released,_Runtime,_Genre,_Director,_Writer,{_,Actors},_Plot,{_,Poster},{_,Rating},_Votes,_ID,_Response]} = ParsedJsonResult,
+    {ConvertedRating,_} = string:to_float(Rating),
+    [#movie{title=Title,year=Year,actors=Actors,poster=Poster,rating=ConvertedRating}].
 
 get_tomatoes_result(SearchTitle) ->
 	APIKey = "b2x78beenefg6tq3ynr56r4a",
@@ -60,7 +66,7 @@ build_tomatoes_result_from(Movie) ->
 	CriticsScore = proplists:get_value("critics_score", Ratings),
 	AudienceScore = proplists:get_value("audience_score", Ratings),
 	AverageRating = (CriticsScore + AudienceScore) / 2 / 10,
-	[{struct,[{"Title",Title},{"Year",Year},{"Actors",Actors},{"Posters",Posters},{"Rating",AverageRating}]}].
+	[#movie{title=Title,year=Year,actors=Actors,poster=Posters,rating=AverageRating}].
 
 get_tmdb_result(SearchTitle) ->
 	APIKey = "8abd8211399f1196bdefef458fc4c5ed",
@@ -78,19 +84,14 @@ get_tmdb_result(SearchTitle) ->
 	{struct,[_Page,{_Results,{array,[FirstResult|_]}},_TotalPages,_TotalResults]} = ParsedJsonResult,
 	{struct,[_Adult,_Backdrop,_Id,_OriginalTitle,{_,ReleaseDate},{_,Poster},_Popularity,{_,Title},{_,Rating},_Votes]} = FirstResult,
 	[Year,_Month,_Day] = string:tokens(ReleaseDate,"-"),
-	[{struct,[{"Title",Title},{"Year",Year},{"Actors",""},{"Poster",Poster},{"Rating",Rating}]}].
+	[#movie{title=Title,year=Year,actors="",poster=Poster,rating=Rating}].
 
-combine_results([OMDBResult, TomatoesResult, TMDBResult]) ->
-	%% TODO: Use records instead!
-	{_,[_,_,_,_,{_,OMDBRating}]} = OMDBResult,
-
-    {ConvertedOMDBRating,_} = string:to_float(OMDBRating),
-    {_,[_,_,_,_,{_,TomatoesRating}]} = TomatoesResult,
-
-    {_,[_,_,_,_,{_,TMDBRating}]} = TMDBResult,
+combine_results(Results) ->
+	Ratings = [Movie#movie.rating || Movie <- Results],
+    AverageRating = round_rating(average(Ratings)),
     
-    AverageRating = (ConvertedOMDBRating + TomatoesRating + TMDBRating) / 3,
-    {array,[{struct,[{"AverageRating", round_rating(AverageRating)}]},OMDBResult,TomatoesResult,TMDBResult]}.
+    ConvertedResults = [{struct, movie_to_proplist(Movie)} || Movie <- Results],
+    {array,[{struct,[{"AverageRating",AverageRating}]} | ConvertedResults]}.
 
  wait_for_response(RequestId) ->
  	receive 
@@ -99,7 +100,7 @@ combine_results([OMDBResult, TomatoesResult, TMDBResult]) ->
  		5000 -> timeout 
  	end.
 
-%% Utility functions (considering moving them elsewhere)
+%% Utility functions (consider moving them elsewhere)
 
 round_rating(Rating) ->
 	[RoundedRating] = io_lib:format("~.2f", [Rating]),
@@ -117,9 +118,12 @@ filter_list(Pattern, List) ->
 	lists:filter(FilterGen(Pattern),List).
 
 average(Numbers) ->
-        average(Numbers, 0, 0).
+	average(Numbers, 0, 0).
 
 average([H|T], Length, Sum) ->
-        average(T, Length + 1, Sum + H);
+    average(T, Length + 1, Sum + H);
 average([], Length, Sum) ->
-        Sum / Length.
+    Sum / Length.
+
+movie_to_proplist(#movie{} = Movie) ->
+    [{K, element(I, Movie)} || {K, I} <- lists:zip(record_info(fields, movie), lists:seq(2, record_info(size, movie)))].
