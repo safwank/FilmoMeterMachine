@@ -41,8 +41,9 @@ get_omdb_result(SearchTitle) ->
     {_, [{_, Title}, {_,Year}, _Rated, _Released, _Runtime, _Genre,
 	     _Director, _Writer, {_, Actors}, _Plot, {_, Poster}, {_, Rating},
 	     _Votes, _ID, _Response]} = ParsedJsonResult,
-    {ConvertedRating,_} = string:to_float(Rating),
-    [#movie{source="OMDB", title=Title, year=Year, actors=Actors, poster=Poster, rating=ConvertedRating}].
+	{ConvertedYear, _} = string:to_integer(Year),
+    {ConvertedRating, _} = string:to_float(Rating),
+    [#movie{source="OMDB", title=Title, year=ConvertedYear, actors=Actors, poster=Poster, rating=ConvertedRating}].
 
 get_flixster_result(SearchTitle) ->
 	APIKey = "b2x78beenefg6tq3ynr56r4a",
@@ -102,7 +103,14 @@ get_tmdb_result(SearchTitle) ->
 
 	Movies = 
 		[#movie{source="TMDB", title=Title, 
-				year=string:substr(ReleaseDate, 1, 4), 
+				year = case ReleaseDate of
+					   		null -> 0;
+					   		ReleaseDate ->
+					   			case string:to_integer(string:substr(ReleaseDate, 1, 4)) of
+					   				{error, _} -> 0;
+					   				{Year, _} -> Year
+					   			end
+					   end,
 				actors="", poster=Poster, rating=Rating}
 		|| {struct,[_Adult, _Backdrop, _Id, _OriginalTitle,
 					{_, ReleaseDate}, {_, Poster}, _Popularity,
@@ -111,11 +119,19 @@ get_tmdb_result(SearchTitle) ->
 	Movies.
 
 combine_results(Results) ->
-	Ratings = [Movie#movie.rating || Movie <- Results],
+	[AuthoritativeSource] = [OMDBSource || OMDBSource = #movie{source="OMDB"} <- Results],
+	ReferenceTitle = AuthoritativeSource#movie.title,
+	ReferenceYear = AuthoritativeSource#movie.year,
+	FilterFun = fun(M, Title, Year) ->
+					(M#movie.title =:= Title) andalso (M#movie.year =:= Year)
+				end,
+	FilteredResults = [M || M <- Results, FilterFun(M, ReferenceTitle, ReferenceYear)],
+
+	Ratings = [M#movie.rating || M <- FilteredResults],
     AverageRating = round_rating(average(Ratings)),
     
-    ConvertedResults = [{struct, movie_to_proplist(Movie)} || Movie <- Results],
-    CombinedResult = {array,[{struct,[{"AverageRating",AverageRating}]} | ConvertedResults]},
+    ConvertedResults = [{struct, movie_to_proplist(Movie)} || Movie <- FilteredResults],
+    CombinedResult = {array, [{struct, [{"average_rating", AverageRating}]} | ConvertedResults]},
     mochijson:encode(CombinedResult).
 
  wait_for_response(RequestId) ->
