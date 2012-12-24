@@ -7,7 +7,7 @@
 
 -include_lib("webmachine/include/webmachine.hrl").
 
--record(movie, {title,year,actors,poster,rating}).
+-record(movie, {source,title,year,actors,poster,rating}).
 
 init([]) -> 
 	{ok, undefined}.
@@ -38,9 +38,11 @@ get_omdb_result(SearchTitle) ->
     {{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
     ParsedJsonResult = mochijson:decode(Body),
     
-    {_,[{_,Title},{_,Year},_Rated,_Released,_Runtime,_Genre,_Director,_Writer,{_,Actors},_Plot,{_,Poster},{_,Rating},_Votes,_ID,_Response]} = ParsedJsonResult,
+    {_, [{_, Title}, {_,Year}, _Rated, _Released, _Runtime, _Genre,
+	     _Director, _Writer, {_, Actors}, _Plot, {_, Poster}, {_, Rating},
+	     _Votes, _ID, _Response]} = ParsedJsonResult,
     {ConvertedRating,_} = string:to_float(Rating),
-    [#movie{title=Title,year=Year,actors=Actors,poster=Poster,rating=ConvertedRating}].
+    [#movie{source="OMDB", title=Title, year=Year, actors=Actors, poster=Poster, rating=ConvertedRating}].
 
 get_flixster_result(SearchTitle) ->
 	APIKey = "b2x78beenefg6tq3ynr56r4a",
@@ -76,7 +78,7 @@ build_flixster_result_from(Movies) ->
 			AudienceScore = proplists:get_value("audience_score", Ratings),
 			AverageRating = (CriticsScore + AudienceScore) / 2 / 10,
 
-			[#movie{title=Title, year=Year, actors=CombinedActors,
+			[#movie{source="Flixster", title=Title, year=Year, actors=CombinedActors,
 					poster=OriginalPoster, rating=AverageRating}] ++ MovieAcc
 		end,
 	
@@ -99,7 +101,8 @@ get_tmdb_result(SearchTitle) ->
 	{struct, [_Page, {_Results, {array, Results}}, _TotalPages, _TotalResults]} = ParsedJsonResult,
 
 	Movies = 
-		[#movie{title=Title, year=string:substr(ReleaseDate, 1, 4), 
+		[#movie{source="TMDB", title=Title, 
+				year=string:substr(ReleaseDate, 1, 4), 
 				actors="", poster=Poster, rating=Rating}
 		|| {struct,[_Adult, _Backdrop, _Id, _OriginalTitle,
 					{_, ReleaseDate}, {_, Poster}, _Popularity,
