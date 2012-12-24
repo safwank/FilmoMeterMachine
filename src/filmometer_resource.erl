@@ -17,16 +17,16 @@ content_types_provided(ReqData, Context) ->
 
 to_json(ReqData, Context) ->
     Title = wrq:get_qs_value("title", ReqData),
+    Results = get_results_for(Title),
+    CombinedResult = combine_results(Results),
+    {CombinedResult, ReqData, Context}.
 
-    %% TODO: Figure out how to retrieve results from a dynamic list of sources
+get_results_for(Title) ->
+	%% TODO: Figure out how to retrieve results from a dynamic list of sources
     OMDBResult = get_omdb_result(Title),
     TomatoesResult = get_tomatoes_result(Title),
     TMDBResult = get_tmdb_result(Title),
-
-    CombinedResult = combine_results(OMDBResult++TomatoesResult++TMDBResult),
-    EncodedCombinedResult = mochijson:encode(CombinedResult),
-
-    {EncodedCombinedResult, ReqData, Context}.
+    OMDBResult++TomatoesResult++TMDBResult.
 
 get_omdb_result(SearchTitle) ->
 	EncodedTitle = mochiweb_util:urlencode([{"t", SearchTitle}]),
@@ -91,7 +91,8 @@ combine_results(Results) ->
     AverageRating = round_rating(average(Ratings)),
     
     ConvertedResults = [{struct, movie_to_proplist(Movie)} || Movie <- Results],
-    {array,[{struct,[{"AverageRating",AverageRating}]} | ConvertedResults]}.
+    CombinedResult = {array,[{struct,[{"AverageRating",AverageRating}]} | ConvertedResults]},
+    mochijson:encode(CombinedResult).
 
  wait_for_response(RequestId) ->
  	receive 
