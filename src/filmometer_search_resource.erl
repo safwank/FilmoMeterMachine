@@ -2,7 +2,7 @@
 %% @copyright 2012 Safwan Kamarrudin.
 %% @doc Look up movie ratings and average them out.
 
--module(filmometer_resource).
+-module(filmometer_search_resource).
 -export([init/1, content_types_provided/2, to_json/2]).
 
 -include_lib("webmachine/include/webmachine.hrl").
