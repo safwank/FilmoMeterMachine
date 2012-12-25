@@ -10,26 +10,83 @@
 				<h1 id="logo">
 					<a href="./">Filmo<span class="light">Meter</span></a>
 				</h1>
-				<h5>Never watch lame-ass movies ever again</h5>
+				<h5>Never watch a lame-ass movie ever again</h5>
 			</header>
 			<hr class="noscreen">
 			<section class="search">
 				<form action="">
-					<input id="keyword" type="text" />
+					<input class="keyword" type="text" placeholder="Movie title" />
 					<span>&nbsp;</span>
-					<button type="button" value="Search"></button>
+					<input type="button" value="Search" />
 				</form>
 			</section>
 			<hr class="noscreen">
 			<section class="result">
-				Result here
+				<div class="spinner"></div>
+				<table>
+					<tbody>
+						<tr>
+							<td></td>
+							<td>
+								<div>
+									<fieldset>
+										<legend>Title</legend>
+										<span data-bind='text: averageRating'></span>
+									</fieldset>
+									<fieldset>
+										<legend>Rating</legend>
+										<span data-bind='text: averageRating'></span>
+									</fieldset>
+									<fieldset>
+										<legend>Year</legend>
+										<span data-bind='text: averageRating'></span>
+									</fieldset>
+									<fieldset>
+										<legend>Actors</legend>
+										<span data-bind='text: averageRating'></span>
+									</fieldset>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 			</section>
 			<footer>
-				<span class="f-left">© 2012 Safwan Kamarrudin</span>
+				<span>© 2012 Safwan Kamarrudin</span>
 			</footer>
 
 			<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 			<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.0.js"></script>
+			<script src="https://raw.github.com/SteveSanderson/knockout.mapping/master/build/output/knockout.mapping-latest.js"></script>
+			<script type="text/javascript">
+				$(document).ready(function() {
+      				/*
+					var viewModel = {
+						averageRating: ko.observable(),
+						ratings: ko.observable()
+					};*/
+					var spinner = $('.spinner');
+
+					$(':button').click(function() {
+						var keyword = $(':text').val();
+						
+						if (keyword != '') {
+							spinner.show();
+
+							$.getJSON('/search?title=' + keyword, function(data) {
+								spinner.hide();
+
+								var viewModel = ko.mapping.fromJS(data);
+								/*
+								viewModel.averageRating(data.averageRating);
+								viewModel.ratings(data.ratings);*/
+								//alert(JSON.stringify(viewModel));
+								//alert(viewModel.averageRating);
+							});
+						}
+					});
+				});
+			</script>
 		</div>
 	</body>
 </html>

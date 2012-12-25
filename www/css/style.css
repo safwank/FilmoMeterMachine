@@ -82,7 +82,7 @@ section {
 }
 header {
   position: relative;
-  padding-left: 7px;
+  /*padding-left: 7px;*/
 }
 #logo {
   font-family: Impact, 'Techno CE', sans-serif;
@@ -258,7 +258,7 @@ legend {
   margin-left: 10px;
   font-size: 100%;
   font-weight: bold;
-  color: #000;
+  color: #fff;
 }
 abbr,
 acronym,
@@ -358,4 +358,24 @@ body#reports a#reports span {
   text-decoration: underline;
   font-style: oblique;
   font-weight: bold;
+}
+
+/*
+input.search {
+  background: transparent url('../img/search.png') no-repeat;
+  width: 32px;
+  height: 32px;
+  border: none;
+}*/
+
+.spinner {
+  background: url('../img/spinner.gif') no-repeat;
+  width: 16px;
+  height: 11px;
+  display: none;
+
+}
+
+input.keyword {
+  width: 25%;
 }
