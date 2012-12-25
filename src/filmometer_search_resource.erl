@@ -141,7 +141,7 @@ combine_results(Results) ->
 		    AverageRating = round_rating(average(Ratings)),
 		    
 		    ConvertedResults = [{struct, movie_to_proplist(Movie)} || Movie <- FilteredResults],
-		    CombinedResult = {array, [{struct, [{"average_rating", AverageRating}]} | ConvertedResults]},
+		    CombinedResult = {struct, [{"averageRating", AverageRating}, {"ratings", {array, ConvertedResults}}]},
 		    mochijson:encode(CombinedResult)
 	end.
 
