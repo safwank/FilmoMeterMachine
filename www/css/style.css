@@ -193,21 +193,16 @@ p {
 }
 table {
   margin: 15px 0;
-  border: 1px solid #324455;
-  border-collapse: collapse;
-  border-spacing: 0;
   font-size: 100%;
   width: 100%;
 }
 th {
   text-align: center;
   font-weight: bold;
-  border: 1px solid #324455;
 }
 th,
 td {
   padding: 4px 6px;
-  border: 1px solid #324455;
 }
 tr.table-top {
   background: #425364;
@@ -250,8 +245,7 @@ dd {
   margin-left: 30px;
 }
 fieldset {
-  margin: 15px 0;
-  padding: 10px;
+  padding: 1px;
   border: 1px solid #ccc;
 }
 legend {
@@ -360,22 +354,30 @@ body#reports a#reports span {
   font-weight: bold;
 }
 
-/*
-input.search {
-  background: transparent url('../img/search.png') no-repeat;
-  width: 32px;
-  height: 32px;
-  border: none;
-}*/
+input.keyword {
+  width: 25%;
+  height: 20px;
+}
+
+input.searchTrigger {
+  height: 20px;
+}
 
 .spinner {
   background: url('../img/spinner.gif') no-repeat;
   width: 16px;
   height: 11px;
-  display: none;
-
+  visibility: hidden;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
-input.keyword {
-  width: 25%;
+.result {
+  display: none;
+}
+
+img.poster {
+  vertical-align: top;
+  width: 150px;
+  height: 200px;
 }
