@@ -46,10 +46,10 @@ get_omdb_result(SearchTitle) ->
 			     _Votes, _ID, _Response]} = ParsedJsonResult,
 
 			{ConvertedYear, _} = string:to_integer(Year),
-		    {ConvertedRating, _} = case is_number(Rating) of
-		    					   		false -> {0, 0};
-		    					   		true -> string:to_float(Rating)
-		    					   end,
+		    ConvertedRating = case string:to_float(Rating) of
+		    				  	{error,_} -> 0;
+		    				  	{R, _} -> R
+		    				  end,
 		    [#movie{source="OMDB", title=Title, year=ConvertedYear, actors=Actors, poster=Poster, rating=ConvertedRating}]
 	end.
 
@@ -155,8 +155,12 @@ combine_results(Results) ->
 %% Utility functions (consider moving them elsewhere)
 
 round_rating(Rating) ->
-	[RoundedRating] = io_lib:format("~.2f", [Rating]),
-	RoundedRating.
+	case Rating of
+		0 -> 0;
+		_ -> 
+			[RoundedRating] = io_lib:format("~.2f", [Rating]),
+			RoundedRating
+	end.
 
 filter_list(Pattern, List) ->
 	Eval = fun(S) -> 
@@ -169,6 +173,7 @@ filter_list(Pattern, List) ->
 				end,
 	lists:filter(FilterGen(Pattern),List).
 
+average([]) -> 0;
 average(Numbers) ->
 	average(Numbers, 0, 0).
 
