@@ -46,7 +46,10 @@ get_omdb_result(SearchTitle) ->
 			     _Votes, _ID, _Response]} = ParsedJsonResult,
 
 			{ConvertedYear, _} = string:to_integer(Year),
-		    {ConvertedRating, _} = string:to_float(Rating),
+		    {ConvertedRating, _} = case is_number(Rating) of
+		    					   		false -> {0, 0};
+		    					   		true -> string:to_float(Rating)
+		    					   end,
 		    [#movie{source="OMDB", title=Title, year=ConvertedYear, actors=Actors, poster=Poster, rating=ConvertedRating}]
 	end.
 
@@ -134,7 +137,7 @@ combine_results(Results) ->
 						end,
 			FilteredResults = [M || M <- Results, FilterFun(M, ReferenceTitle, ReferenceYear)],
 
-			Ratings = [M#movie.rating || M <- FilteredResults],
+			Ratings = [M#movie.rating || M <- FilteredResults, M#movie.rating > 0],
 		    AverageRating = round_rating(average(Ratings)),
 		    
 		    ConvertedResults = [{struct, movie_to_proplist(Movie)} || Movie <- FilteredResults],
