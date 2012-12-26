@@ -71,103 +71,105 @@
 			<section class="no-result">
 				<p>I haz no such movie :(</p>
 			</section>
-			<footer>
-				<span>© 2012 Safwan Kamarrudin</span>
-			</footer>
+		</div>
 
-			<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-			<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.0.js"></script>
-			<script type="text/javascript" src="https://raw.github.com/SteveSanderson/knockout.mapping/master/build/output/knockout.mapping-latest.js"></script>
-			<script type="text/javascript">
-				$(document).ready(function() {
-					/* Variables */
-					
-					var viewModel = {};
-					var keyword = $(':text');
-      				var spinner = $('.spinner');
-      				var result = $('.result');
-      				var noResult = $('.no-result');
-      				var individualResults = $('.individual-results');
-      				var individualResultsShown = false;
-      				var bindingsApplied = false;
+		<footer>
+			<span class="source"><a href="https://github.com/safwank/FilmoMeterMachine" target="_blank">Source code</a></span>
+			<span class="copyright">© 2012 <a href="mailto:shaihulud@alumni.cmu.edu?Subject=FilmoMeter%20rocks">Safwan Kamarrudin</a></span>
+		</footer>
 
-      				/* Functions */
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.0.js"></script>
+		<script type="text/javascript" src="https://raw.github.com/SteveSanderson/knockout.mapping/master/build/output/knockout.mapping-latest.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				/* Variables */
 
-      				search = function() {
-      					if (keyword.val() != '') {
-      						showSpinner();
-							resetView();
+				var viewModel = {};
+				var keyword = $(':text');
+  				var spinner = $('.spinner');
+  				var result = $('.result');
+  				var noResult = $('.no-result');
+  				var individualResults = $('.individual-results');
+  				var individualResultsShown = false;
+  				var bindingsApplied = false;
 
-							$.getJSON('/search?title=' + keyword.val(), function(data) {
-								hideSpinner();
-								bindToViewModel(data);
-							});
-						}
-      				};
+  				/* Functions */
 
-      				showSpinner = function() {
-      					spinner.css('visibility','visible');
-      				};
+  				search = function() {
+  					if (keyword.val() != '') {
+  						showSpinner();
+						resetView();
 
-      				hideSpinner = function() {
-      					spinner.css('visibility','hidden');
-      				};
+						$.getJSON('/search?title=' + keyword.val(), function(data) {
+							hideSpinner();
+							bindToViewModel(data);
+						});
+					}
+  				};
 
-      				resetView = function() {
-						result.slideUp();
-						noResult.slideUp();
-						resetIndividualResults();
-      				};
+  				showSpinner = function() {
+  					spinner.css('visibility','visible');
+  				};
 
-      				bindToViewModel = function(data) {
-      					if (data == null) {
-							noResult.slideDown();
+  				hideSpinner = function() {
+  					spinner.css('visibility','hidden');
+  				};
+
+  				resetView = function() {
+					result.slideUp();
+					noResult.slideUp();
+					resetIndividualResults();
+  				};
+
+  				bindToViewModel = function(data) {
+  					if (data == null) {
+						noResult.slideDown();
+					} else {
+						result.slideDown();
+								
+						if (!bindingsApplied) {
+							viewModel = ko.mapping.fromJS(data);
+							ko.applyBindings(viewModel);
+							bindingsApplied = true;
 						} else {
-							result.slideDown();
-									
-							if (!bindingsApplied) {
-								viewModel = ko.mapping.fromJS(data);
-								ko.applyBindings(viewModel);
-								bindingsApplied = true;
-							} else {
-								ko.mapping.fromJS(data, viewModel);
-							}
-						}
-      				};
-
-      				resetIndividualResults = function() {
-      					individualResults.slideUp();
-      					individualResultsShown = false;
-      				};
-
-      				searchIfEnterIsPressed = function(e) {
-      					if (e.which == 13) {
-							search();
-						}
-      				};
-
-      				toggleIndividualResultsDisplay = function(e) {
-						e.preventDefault();
-
-						if (individualResultsShown) {
-							resetIndividualResults();
-						} else {
-							individualResults.slideDown();
-							individualResultsShown = true;
+							ko.mapping.fromJS(data, viewModel);
 						}
 					}
+  				};
 
-					/* Events */
-					
-					$('form').submit(function(e){
-    					e.preventDefault();
-					});
+  				resetIndividualResults = function() {
+  					individualResults.slideUp();
+  					individualResultsShown = false;
+  				};
 
-					keyword.keypress(searchIfEnterIsPressed);
+  				searchIfEnterIsPressed = function(e) {
+  					if (e.which == 13) {
+						search();
+					}
+  				};
 
-					$('.result a').click(toggleIndividualResultsDisplay);
+  				toggleIndividualResultsDisplay = function(e) {
+					e.preventDefault();
+
+					if (individualResultsShown) {
+						resetIndividualResults();
+					} else {
+						individualResults.slideDown();
+						individualResultsShown = true;
+					}
+				}
+
+				/* Events */
+				
+				$('form').submit(function(e){
+					e.preventDefault();
 				});
-			</script>
-		</div>
+
+				keyword.keypress(searchIfEnterIsPressed);
+
+				$('.result a').click(toggleIndividualResultsDisplay);
+			});
+		</script>
 	</body>
 </html>

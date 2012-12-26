@@ -81,13 +81,19 @@ applet,
 object {
   border: 0;
 }
+html {
+  height: 100%;
+}
 body {
   background: #192d40 url("../img/bg.jpg") repeat-x;
   font-family: "arial", sans-serif;
   font-size: 13px;
   line-height: 24px;
   color: #e8eaeb;
-  text-align: center;
+  width: 790px;
+  height: 100%;
+  margin: 0 auto;
+  text-align: left;
 }
 a {
   color: #fff;
@@ -119,9 +125,8 @@ h5 {
   font-size: 90%;
 }
 #layout {
-  width: 790px;
-  margin: 0 auto;
-  text-align: left;
+  height: 100%;
+  min-height: 100%;
 }
 section {
   padding-top: 12px;
@@ -216,8 +221,10 @@ nav ul li#active a,
 }
 footer {
   clear: both;
+  position: relative;
+  z-index: 10;
   height: 77px;
-  margin-top: 20px;
+  margin-top: -3em;
   border-top: 1px solid #324455;
   padding: 10px 3px;
   color: #a0a9b0;
@@ -229,6 +236,12 @@ footer a {
 footer p {
   margin: 0;
   padding-top: 10px;
+}
+footer span.source {
+  float: left;
+}
+footer span.copyright {
+  float: right;
 }
 p {
   margin: 15px 0;
