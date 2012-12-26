@@ -138,10 +138,13 @@ combine_results(Results) ->
 			FilteredResults = [M || M <- Results, FilterFun(M, ReferenceTitle, ReferenceYear)],
 
 			Ratings = [M#movie.rating || M <- FilteredResults, M#movie.rating > 0],
-		    AverageRating = round_rating(average(Ratings)),
+		    {AverageRating, _} = string:to_float(round_rating(average(Ratings))),
+		    Verdict = get_verdict_for(AverageRating),
 		    
 		    ConvertedResults = [{struct, movie_to_proplist(Movie)} || Movie <- FilteredResults],
-		    CombinedResult = {struct, [{"averageRating", AverageRating}, {"ratings", {array, ConvertedResults}}]},
+		    CombinedResult = {struct, [{"averageRating", AverageRating}, 
+		    						   {"verdict", Verdict},
+		    						   {"ratings", {array, ConvertedResults}}]},
 		    mochijson:encode(CombinedResult)
 	end.
 
@@ -152,7 +155,19 @@ combine_results(Results) ->
  		5000 -> timeout 
  	end.
 
-%% Utility functions (consider moving them elsewhere)
+get_verdict_for(Score) ->
+	if
+		Score >= 8 ->
+			"Hellz yeah!";
+		Score >= 6 ->
+			"Meh";
+		Score >= 4 ->
+			"I pity the fools who watch this";
+		true ->
+			"Avoid like the plague"
+	end.
+
+%% TODO: Utility functions (consider moving them elsewhere)
 
 round_rating(Rating) ->
 	case Rating of
