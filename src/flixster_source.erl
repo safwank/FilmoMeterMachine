@@ -9,7 +9,7 @@
 
 get_result(SearchTitle) ->
 	APIKey = "b2x78beenefg6tq3ynr56r4a",
-	PageLimit = 3,
+	PageLimit = 5,
 	EncodedTitle = mochiweb_util:urlencode([{"q", SearchTitle}]),
 	RequestUri = lists:flatten(
 				 	io_lib:format("http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=~s&page_limit=~p&~s", 
