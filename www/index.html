@@ -17,7 +17,7 @@
 			<section class="search">
 				<form action="">
 					<input class="keyword" type="text" placeholder="Movie title"></input>
-					<input type="button" class="searchTrigger" value="Search"></input>
+					<span class="search-icon"></span>
 					<div class="spinner"></div>
 				</form>
 			</section>
@@ -26,7 +26,7 @@
 				<table>
 					<tbody>
 						<tr>
-							<td>
+							<td class="poster">
 								<img class="poster" data-bind="attr:{src: $root.ratings()[1].poster}"></img>
 							</td>
 							<td>
@@ -53,6 +53,9 @@
 					</tbody>
 				</table>
 			</section>
+			<section class="no-result">
+				<p>I haz no such movie :(</p>
+			</section>
 			<footer>
 				<span>© 2012 Safwan Kamarrudin</span>
 			</footer>
@@ -65,6 +68,7 @@
 					var keyword = $(':text');
       				var spinner = $('.spinner');
       				var result = $('.result');
+      				var noResult = $('.no-result');
 
       				$('form').submit(function(e){
     					e.preventDefault();
@@ -74,19 +78,22 @@
       					if (keyword.val() != '') {
 							spinner.css('visibility','visible');
 							result.slideUp();
+							noResult.slideUp();
 
 							$.getJSON('/search?title=' + keyword.val(), function(data) {
 								spinner.css('visibility','hidden');
-								result.slideDown();
 
-								var viewModel = ko.mapping.fromJS(data);
-
-								ko.applyBindings(viewModel);
+								if (data == null) {
+									noResult.slideDown();
+								}
+								else {
+									result.slideDown();
+									var viewModel = ko.mapping.fromJS(data);
+									ko.applyBindings(viewModel);
+								}
 							});
 						}
       				};
-
-					$(':button').click(search);
 
 					keyword.keypress(function(e) {
 						// Enter key

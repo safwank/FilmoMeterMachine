@@ -250,6 +250,9 @@ th,
 td {
   padding: 4px 6px;
 }
+td.poster {
+  width: 20%;
+}
 tr.table-top {
   background: #425364;
   font-weight: bold;
@@ -405,8 +408,15 @@ input.keyword {
   height: 20px;
 }
 
-input.searchTrigger {
-  height: 20px;
+.search-icon {
+  background: url('../img/search.png') no-repeat;
+  display: inline-block;
+  width: 25px;
+  height: 17px;
+  vertical-align: bottom;
+  position: relative;
+  left: -30px;
+  top: -3px;
 }
 
 .spinner {
@@ -420,6 +430,11 @@ input.searchTrigger {
 
 .result {
   display: none;
+}
+
+.no-result {
+  display: none;
+  font-weight: bold;
 }
 
 img.poster {
