@@ -443,3 +443,7 @@ img.poster {
   width: 150px;
   height: 200px;
 }
+
+.individual-results {
+  display: none;
+}
