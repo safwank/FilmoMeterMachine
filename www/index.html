@@ -26,13 +26,6 @@
 				<table>
 					<tbody>
 						<tr>
-							<td colspan="2">
-								<label>Verdict: </label>
-								<meter min="0" max="10" title="score" data-bind="attr:{value: averageRating}"></meter>
-								<span data-bind="text: verdict"></span>
-							</td>
-						</tr>
-						<tr>
 							<td class="poster">
 								<img class="poster" data-bind="attr:{src: $root.ratings()[1].poster}"></img>
 							</td>
@@ -53,7 +46,12 @@
 									<li>
 										<label>Actors:</label>
 										<span data-bind="text: $root.ratings()[0].actors"></span>
-									</fieldset>
+									</li>
+									<li>
+										<label>Verdict: </label>
+										<meter min="0" max="10" title="score" data-bind="attr:{value: averageRating}"></meter>
+										<span data-bind="text: verdict"></span>
+									</li>
 								</ul>
 							</td>
 						</tr>
