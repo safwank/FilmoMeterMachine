@@ -26,28 +26,34 @@
 				<table>
 					<tbody>
 						<tr>
+							<td colspan="2">
+								<label>Verdict: </label>
+								<meter min="0" max="10" title="score" data-bind="attr:{value: averageRating}"></meter>
+							</td>
+						</tr>
+						<tr>
 							<td class="poster">
 								<img class="poster" data-bind="attr:{src: $root.ratings()[1].poster}"></img>
 							</td>
 							<td>
-								<div>
-									<fieldset>
-										<legend>Title</legend>
+								<ul>
+									<li>
+										<label>Title:</label>
 										<span data-bind="text: $root.ratings()[0].title"></span>
+									</li>
+									<li>
+										<label>Rating:</label>
+										<span data-bind="text: averageRating"></span>
+									</li>
+									<li>
+										<label>Year:</label>
+										<span data-bind="text: $root.ratings()[0].year"></span>
+									</li>
+									<li>
+										<label>Actors:</label>
+										<span data-bind="text: $root.ratings()[0].actors"></span>
 									</fieldset>
-									<fieldset>
-										<legend>Rating</legend>
-										<span data-bind='text: averageRating'></span>
-									</fieldset>
-									<fieldset>
-										<legend>Year</legend>
-										<span data-bind='text: $root.ratings()[0].year'></span>
-									</fieldset>
-									<fieldset>
-										<legend>Actors</legend>
-										<span data-bind='text: $root.ratings()[0].actors'></span>
-									</fieldset>
-								</div>
+								</ul>
 							</td>
 						</tr>
 					</tbody>

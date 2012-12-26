@@ -82,7 +82,6 @@ object {
   border: 0;
 }
 body {
-  padding: 0 0;
   background: #192d40 url("../img/bg.jpg") repeat-x;
   font-family: "arial", sans-serif;
   font-size: 13px;
@@ -126,9 +125,11 @@ h5 {
 }
 section {
   padding-top: 12px;
+  padding-left: 5px;
 }
 header {
   position: relative;
+  padding-left: 5px;
 }
 #logo {
   font-family: Impact, 'Techno CE', sans-serif;
@@ -164,18 +165,13 @@ nav {
   border: 1px solid #1a2735;
   border-right: none;
   border-left: none;
-  padding: 7px 0;
 }
 nav ul {
-  margin: 0;
-  padding: 0;
   list-style: none;
 }
 nav ul li {
   float: left;
   display: inline;
-  margin: 0;
-  padding: 0;
 }
 nav ul li a {
   font-size: 19px;
@@ -245,10 +241,6 @@ table {
 th {
   text-align: center;
   font-weight: bold;
-}
-th,
-td {
-  padding: 4px 6px;
 }
 td.poster {
   width: 20%;
@@ -337,7 +329,6 @@ hr {
   display: block;
   height: 1px;
   margin: 10px 0;
-  padding: 0;
   border: 0 solid #ccc;
   background: #ccc;
   color: #ccc;
@@ -430,6 +421,16 @@ input.keyword {
 
 .result {
   display: none;
+}
+
+.result label {
+  font-size: 15px;
+  color: #666;
+  margin: 0 5px 0 0;
+}
+
+.result span {
+  font-size: 12px;
 }
 
 .no-result {
