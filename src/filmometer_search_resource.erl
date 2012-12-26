@@ -95,6 +95,7 @@ build_flixster_result_from(Movies) ->
 	MovieList.
 
 get_tmdb_result(SearchTitle) ->
+	PosterBaseUri = "http://cf2.imgobject.com/t/p/w185/",
 	APIKey = "8abd8211399f1196bdefef458fc4c5ed",
 	EncodedTitle = mochiweb_util:urlencode([{"query", SearchTitle}]),
 	RequestUri = lists:flatten(
@@ -119,7 +120,7 @@ get_tmdb_result(SearchTitle) ->
 					   				{Year, _} -> Year
 					   			end
 					   end,
-				actors="", poster=Poster, rating=Rating}
+				actors="", poster=string:concat(PosterBaseUri, Poster), rating=Rating}
 		|| {struct,[_Adult, _Backdrop, _Id, _OriginalTitle,
 					{_, ReleaseDate}, {_, Poster}, _Popularity,
 					{_, Title}, {_, Rating}, _Votes]} 
