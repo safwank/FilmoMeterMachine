@@ -159,12 +159,16 @@ get_verdict_for(Score) ->
 	if
 		Score >= 8 ->
 			"Hellz yeah!";
+		Score >= 7 ->
+			"Uhmm, yeah";
 		Score >= 6 ->
 			"Meh";
 		Score >= 4 ->
-			"I pity the fools who watch this";
+			"I pity the fools who watched this";
+		Score >= 2 ->
+			"Avoid like the plague";
 		true ->
-			"Avoid like the plague"
+			"There should be a crime against watching this"
 	end.
 
 %% TODO: Utility functions (consider moving them elsewhere)
