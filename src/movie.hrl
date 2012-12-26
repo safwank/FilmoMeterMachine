@@ -1,0 +1,1 @@
+-record(movie, {source,title,year,actors,poster,rating}).

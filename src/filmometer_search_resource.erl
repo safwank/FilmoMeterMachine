@@ -6,8 +6,7 @@
 -export([init/1, content_types_provided/2, to_json/2]).
 
 -include_lib("webmachine/include/webmachine.hrl").
-
--record(movie, {source,title,year,actors,poster,rating}).
+-include("movie.hrl").
 
 init([]) -> 
 	{ok, undefined}.
