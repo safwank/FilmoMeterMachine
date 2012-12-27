@@ -10,9 +10,8 @@
 	<body> 
 
 		<div data-role="page" data-theme="b" id="search-page">
-
 			<div data-role="header" data-theme="b">
-				<h1>FilmoMeter</h1>
+				<h1><span>Filmo</span><span class="light">Meter</span></h1>
 			</div>
 
 			<div data-role="content" data-theme="b">
@@ -32,24 +31,64 @@
 				<span class="source"><a href="https://github.com/safwank/FilmoMeterMachine" target="_blank">Source code</a></span>
 				<span class="copyright">© 2012 <a href="mailto:shaihulud@alumni.cmu.edu?Subject=FilmoMeter%20rocks">Safwan Kamarrudin</a></span>
 			</div>
-
 		</div>
 
 		<div data-role="page" data-theme="b" id="detail-page">
-
 			<div data-role="header" data-theme="b">
-				<h1>FilmoMeter</h1>
+				<h1>
+					<span data-bind="text: $root.ratings()[0].title"></span>
+					(<span data-bind="text: $root.ratings()[0].year"></span>)
+				</h1>
 				<a data-role="button" data-direction="reverse" data-rel="back" href="#detail-page" data-icon="arrow-l" data-iconpos="left" data-transition="slide">Back</a>
 			</div>
 
 			<div data-role="content">
+				<ul data-role="listview" data-inset="true" class="result">
+					<li>
+						<label>Actors:</label>
+						<span data-bind="text: $root.ratings()[0].actors"></span>
+					</li>
+					<li>
+						<a href="#ratings-page" data-transition="slide">
+							<label>Rating:</label>
+							<span data-bind="text: averageRating"></span>
+						</a>
+					</li>
+					<li>
+						<label>Verdict:</label>
+						<span data-bind="text: verdict"></span>
+					</li>
+				</ul>
     		</div>
 
 			<div data-role="footer" data-theme="b">
 				<span class="source"><a href="https://github.com/safwank/FilmoMeterMachine" target="_blank">Source code</a></span>
 				<span class="copyright">© 2012 <a href="mailto:shaihulud@alumni.cmu.edu?Subject=FilmoMeter%20rocks">Safwan Kamarrudin</a></span>
 			</div>
+		</div>
 
+		<div data-role="page" data-theme="b" id="ratings-page">
+			<div data-role="header" data-theme="b">
+				<h1>
+					<span data-bind="text: $root.ratings()[0].title"></span>
+					(<span data-bind="text: $root.ratings()[0].year"></span>)
+				</h1>
+				<a data-role="button" data-direction="reverse" data-rel="back" href="#ratings-page" data-icon="arrow-l" data-iconpos="left" data-transition="slide">Back</a>
+			</div>
+
+			<div data-role="content">
+				<ul data-role="listview" data-inset="true" data-bind="foreach: ratings">
+					<li>
+						<span data-bind="text: source"></span> -
+						<span data-bind="text: rating"></span>
+					</li>
+				</ul>
+    		</div>
+
+			<div data-role="footer" data-theme="b">
+				<span class="source"><a href="https://github.com/safwank/FilmoMeterMachine" target="_blank">Source code</a></span>
+				<span class="copyright">© 2012 <a href="mailto:shaihulud@alumni.cmu.edu?Subject=FilmoMeter%20rocks">Safwan Kamarrudin</a></span>
+			</div>
 		</div>
 
 		<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
@@ -141,13 +180,14 @@
 				//$('.result a').click(toggleIndividualResultsDisplay);
 			});
 
+			/*
 			$(document).live('pagebeforechange', function() {
 				$('[data-role=footer]').hide();
 			});
 
 			$(document).live('pagechange', function() {
 				$('[data-role=footer]').show();
-			});
+			});*/
 		</script>
 	</body>
 </html>

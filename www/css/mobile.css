@@ -17,6 +17,10 @@ html, body {
   padding-bottom: 20px; 
 }
 
+.light {
+  color: #3f576e;
+}
+
 [data-role=footer] {
   position: absolute;
   bottom: 0;
