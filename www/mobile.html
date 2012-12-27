@@ -43,7 +43,8 @@
 			</div>
 
 			<div data-role="content">
-				<ul data-role="listview" data-inset="true" class="result">
+				<div id="gauge"></div>
+				<ul data-role="listview" data-inset="true">
 					<li>
 						<label>Actors:</label>
 						<span data-bind="text: $root.ratings()[0].actors"></span>
@@ -95,6 +96,8 @@
 		<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
 		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.0.js"></script>
 		<script type="text/javascript" src="https://raw.github.com/SteveSanderson/knockout.mapping/master/build/output/knockout.mapping-latest.js"></script>
+		<script src="http://code.highcharts.com/highcharts.js"></script>
+		<script src="http://code.highcharts.com/highcharts-more.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function() {
 				/* Variables */
@@ -117,6 +120,7 @@
 						$.getJSON('/search?title=' + keyword.val(), function(data) {
 							hideSpinner();
 							bindToViewModel(data);
+							updateMeter(data.averageRating);
 						});
 					}
   				};
@@ -173,11 +177,117 @@
 					}
 				}
 
+				updateMeter = function(value) {
+					var point = chart.series[0].points[0];
+	            	point.update(value);
+				}
+
 				/* Events */
 				
 				keyword.keypress(searchIfEnterIsPressed);
 
 				//$('.result a').click(toggleIndividualResultsDisplay);
+
+				/* Frakking meter! */
+
+				var chart = new Highcharts.Chart({
+			        chart: {
+			            renderTo: 'gauge',
+			            type: 'gauge',
+			            plotBackgroundColor: null,
+			            plotBackgroundImage: null,
+			            plotBorderWidth: 0,
+			            plotShadow: false,
+			            backgroundColor: 'transparent'
+			        },
+			        
+			        title: {
+			            text: ''
+			        },
+			        
+			        pane: {
+			            startAngle: -150,
+			            endAngle: 150,
+			            background: [{
+			                backgroundColor: {
+			                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+			                    stops: [
+			                        [0, '#FFF'],
+			                        [1, '#333']
+			                    ]
+			                },
+			                borderWidth: 0,
+			                outerRadius: '109%'
+			            }, {
+			                backgroundColor: {
+			                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+			                    stops: [
+			                        [0, '#333'],
+			                        [1, '#FFF']
+			                    ]
+			                },
+			                borderWidth: 1,
+			                outerRadius: '107%'
+			            }, {
+			                // default background
+			            }, {
+			                backgroundColor: '#DDD',
+			                borderWidth: 0,
+			                outerRadius: '105%',
+			                innerRadius: '103%'
+			            }]
+			        },
+			           
+			        // the value axis
+			        yAxis: {
+			            min: 0,
+			            max: 10,
+			            
+			            minorTickInterval: 'auto',
+			            minorTickWidth: 1,
+			            minorTickLength: 10,
+			            minorTickPosition: 'inside',
+			            minorTickColor: '#666',
+			    
+			            tickPixelInterval: 30,
+			            tickWidth: 2,
+			            tickPosition: 'inside',
+			            tickLength: 10,
+			            tickColor: '#666',
+			            labels: {
+			                step: 2,
+			                rotation: 'auto'
+			            },
+			            title: {
+			                text: 'Rating'
+			            },
+			            plotBands: [{
+			                from: 7,
+			                to: 10,
+			                color: '#55BF3B' // green
+			            }, {
+			                from: 4,
+			                to: 7,
+			                color: '#DDDF0D' // yellow
+			            }, {
+			                from: 0,
+			                to: 4,
+			                color: '#DF5353' // red
+			            }]        
+			        },
+			    
+			        series: [{
+			            name: 'Rating',
+			            data: [8],
+			            tooltip: {
+			                valueSuffix: ' km/h'
+			            }
+			        }],
+
+			        credits: {
+			        	enabled: false
+			        }
+			    }); 
 			});
 
 			/*
