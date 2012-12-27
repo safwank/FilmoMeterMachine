@@ -91,6 +91,7 @@
   				var result = $('.result');
   				var noResult = $('.no-result');
   				var individualResults = $('.individual-results');
+  				var poster = $('.poster');
   				var individualResultsShown = false;
   				var bindingsApplied = false;
 
@@ -120,6 +121,7 @@
 					result.slideUp();
 					noResult.slideUp();
 					resetIndividualResults();
+					poster.attr('src', '');
   				};
 
   				bindToViewModel = function(data) {

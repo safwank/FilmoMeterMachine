@@ -98,6 +98,7 @@
 				var keyword = $('.keyword');
   				var result = $('.result');
   				var noResult = $('.no-result');
+  				var poster = $('.poster');
   				var individualResultsShown = false;
   				var bindingsApplied = false;
 
@@ -109,8 +110,8 @@
 						resetView();
 
 						$.getJSON('/search?title=' + keyword.val(), function(data) {
-							hideSpinner();
 							bindToViewModel(data);
+							hideSpinner();
 						});
 					}
   				};
@@ -126,6 +127,7 @@
   				resetView = function() {
 					result.slideUp();
 					noResult.slideUp();
+					poster.attr('src', '');
   				};
 
   				bindToViewModel = function(data) {
