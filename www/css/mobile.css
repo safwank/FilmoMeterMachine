@@ -1,0 +1,9 @@
+img.poster {
+	width: 40%;
+	height: 100%;
+	text-align: right;
+}
+
+.result {
+	display: none;
+}
