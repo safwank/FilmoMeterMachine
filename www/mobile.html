@@ -21,39 +21,16 @@
 					
 					<li>
 						<a href="#">
-						<img class="ui-li-thumb poster" data-bind="attr:{src: $root.ratings()[1].poster}"></img>
-						<span data-bind="text: $root.ratings()[0].title"></span>
-						(<span data-bind="text: $root.ratings()[0].year"></span>)
+							<img class="ui-li-thumb poster" data-bind="attr:{src: $root.ratings()[1].poster}"></img>
+							<span data-bind="text: $root.ratings()[0].title"></span>
+							(<span data-bind="text: $root.ratings()[0].year"></span>)
 						</a>
 					</li>
 				</ul>
-				<!--div class="ui-block-b">
-					<ul data-role="listview">
-						<li>
-							<label>Title:</label>
-							<span data-bind="text: $root.ratings()[0].title"></span>
-						</li>
-						<li>
-							<label>Year:</label>
-							<span data-bind="text: $root.ratings()[0].year"></span>
-						</li>
-						<li>
-							<label>Actors:</label>
-							<span data-bind="text: $root.ratings()[0].actors"></span>
-						</li>
-						<li>
-							<label>Rating:</label>
-							<span data-bind="text: averageRating"></span>
-						</li>
-						<li>
-							<label>Verdict: </label>
-							<span data-bind="text: verdict"></span>
-						</li>
-					</ul>
-				</div-->
 			</div>
 
 			<div data-role="footer" data-theme="b">
+				<span class="source"><a href="https://github.com/safwank/FilmoMeterMachine" target="_blank">Source code</a></span>
 				<span class="copyright">© 2012 <a href="mailto:shaihulud@alumni.cmu.edu?Subject=FilmoMeter%20rocks">Safwan Kamarrudin</a></span>
 			</div>
 
@@ -146,6 +123,16 @@
 				keyword.keypress(searchIfEnterIsPressed);
 
 				//$('.result a').click(toggleIndividualResultsDisplay);
+			});
+
+			$(document).live( 'pagebeforechange', function() {
+			  // hide footer
+			  $('[data-role=footer]').hide();
+			});
+
+			$(document).live( 'pagechange', function() {
+			  // show footer
+			  $('[data-role=footer]').show();
 			});
 		</script>
 	</body>
