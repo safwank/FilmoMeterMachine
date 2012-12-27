@@ -37,18 +37,16 @@ html, body {
   padding-top: 2px;
 }
 
-.light {
-  color: #3f576e;
-}
-
 label {
 	color: #302226;
 }
 
-#gauge {
-	width: 300px; 
-	height: 200px; 
-	margin: 0 auto;
+img {
+  background: url('../img/spinner.gif') no-repeat;
+}
+
+.light {
+  color: #3f576e;
 }
 
 .no-result {
@@ -57,4 +55,10 @@ label {
 
 .dontmesswithmywrap {
   white-space: normal;
+}
+
+#gauge {
+  width: 300px; 
+  height: 200px; 
+  margin: 0 auto;
 }
