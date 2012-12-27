@@ -12,7 +12,10 @@ round_rating(Rating) ->
 		0 -> 0;
 		_ -> 
 			[RoundedRating] = io_lib:format("~.2f", [Rating]),
-			RoundedRating
+			case string:to_float(RoundedRating) of
+				{error, _} -> 0;
+				{R, _} -> R
+			end
 	end.
 
 filter_list(Pattern, List) ->
@@ -37,5 +40,6 @@ average([], Length, Sum) ->
 
 movie_to_proplist(#movie{} = Movie) ->
     [{K, element(I, Movie)} || {K, I} <- lists:zip(record_info(fields, movie), lists:seq(2, record_info(size, movie)))].
+
 
 

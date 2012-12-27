@@ -40,7 +40,7 @@ combine_results(Results) ->
 			FilteredResults = [M || M <- Results, FilterFun(M, ReferenceTitle, ReferenceYear)],
 
 			Ratings = [M#movie.rating || M <- FilteredResults, M#movie.rating > 0],
-		    {AverageRating, _} = string:to_float(filmo_utils:round_rating(filmo_utils:average(Ratings))),
+		    AverageRating = filmo_utils:round_rating(filmo_utils:average(Ratings)),
 		    Verdict = get_verdict_for(AverageRating),
 		    
 		    ConvertedResults = [{struct, filmo_utils:movie_to_proplist(Movie)} || Movie <- FilteredResults],
