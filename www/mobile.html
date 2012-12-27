@@ -9,7 +9,7 @@
 	</head> 
 	<body> 
 
-		<div data-role="page" data-theme="b">
+		<div data-role="page" data-theme="b" id="search-page">
 
 			<div data-role="header" data-theme="b">
 				<h1>FilmoMeter</h1>
@@ -18,9 +18,8 @@
 			<div data-role="content" data-theme="b">
 				<input type="search" class="keyword" placeholder="Movie title" />
 				<ul data-role="listview" data-inset="true" class="result">
-					
 					<li>
-						<a href="#">
+						<a href="#detail-page">
 							<img class="ui-li-thumb poster" data-bind="attr:{src: $root.ratings()[1].poster}"></img>
 							<span data-bind="text: $root.ratings()[0].title"></span>
 							(<span data-bind="text: $root.ratings()[0].year"></span>)
@@ -28,6 +27,23 @@
 					</li>
 				</ul>
 			</div>
+
+			<div data-role="footer" data-theme="b">
+				<span class="source"><a href="https://github.com/safwank/FilmoMeterMachine" target="_blank">Source code</a></span>
+				<span class="copyright">© 2012 <a href="mailto:shaihulud@alumni.cmu.edu?Subject=FilmoMeter%20rocks">Safwan Kamarrudin</a></span>
+			</div>
+
+		</div>
+
+		<div data-role="page" data-theme="b" id="detail-page">
+
+			<div data-role="header" data-theme="b">
+				<h1>FilmoMeter</h1>
+				<a data-role="button" data-direction="reverse" data-rel="back" href="#detail-page" data-icon="arrow-l" data-iconpos="left">Back</a>
+			</div>
+
+			<div data-role="content">
+    		</div>
 
 			<div data-role="footer" data-theme="b">
 				<span class="source"><a href="https://github.com/safwank/FilmoMeterMachine" target="_blank">Source code</a></span>
@@ -125,14 +141,12 @@
 				//$('.result a').click(toggleIndividualResultsDisplay);
 			});
 
-			$(document).live( 'pagebeforechange', function() {
-			  // hide footer
-			  $('[data-role=footer]').hide();
+			$(document).live('pagebeforechange', function() {
+				$('[data-role=footer]').hide();
 			});
 
-			$(document).live( 'pagechange', function() {
-			  // show footer
-			  $('[data-role=footer]').show();
+			$(document).live('pagechange', function() {
+				$('[data-role=footer]').show();
 			});
 		</script>
 	</body>

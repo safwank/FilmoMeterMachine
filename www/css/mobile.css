@@ -28,9 +28,11 @@ html, body {
 [data-role=footer] > .source {
   float: left;
   padding-left: 5px;
+  padding-top: 2px;
 }
 
 [data-role=footer] > .copyright {
   float: right;
   padding-right: 5px;
+  padding-top: 2px;
 }
