@@ -127,6 +127,7 @@
   				resetView = function() {
 					result.slideUp();
 					noResult.slideUp();
+					resetMeter();
 					poster.attr('src', '');
   				};
 
@@ -143,8 +144,6 @@
 						} else {
 							ko.mapping.fromJS(data, viewModel);
 						}
-
-						updateMeter(data.averageRating);
 					}
   				};
 
@@ -170,14 +169,21 @@
 					}
 				}
 
+				resetMeter = function() {
+					chart.series[0].points[0].update(0);
+				};
+
 				updateMeter = function(value) {
-					var point = chart.series[0].points[0];
-	            	point.update(value);
-				}
+					chart.series[0].points[0].update(viewModel.averageRating());
+				};
 
 				/* Events */
 				
 				keyword.keypress(searchIfEnterIsPressed);
+
+				$(document).bind('pagechange', function() {
+					updateMeter();
+				});
 
 				/* Frakking meter! */
 
@@ -283,7 +289,7 @@
 			    
 			        series: [{
 			            name: 'Rating',
-			            data: [8],
+			            data: [0],
 			            tooltip: {
 			                valueSuffix: '/10'
 			            }
