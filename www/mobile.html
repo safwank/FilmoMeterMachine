@@ -19,7 +19,7 @@
 				<input type="search" class="keyword" placeholder="Movie title" />
 				<ul data-role="listview" data-inset="true" class="result">
 					<li>
-						<a href="#detail-page">
+						<a href="#detail-page" data-transition="slide">
 							<img class="ui-li-thumb poster" data-bind="attr:{src: $root.ratings()[1].poster}"></img>
 							<span data-bind="text: $root.ratings()[0].title"></span>
 							(<span data-bind="text: $root.ratings()[0].year"></span>)
@@ -39,7 +39,7 @@
 
 			<div data-role="header" data-theme="b">
 				<h1>FilmoMeter</h1>
-				<a data-role="button" data-direction="reverse" data-rel="back" href="#detail-page" data-icon="arrow-l" data-iconpos="left">Back</a>
+				<a data-role="button" data-direction="reverse" data-rel="back" href="#detail-page" data-icon="arrow-l" data-iconpos="left" data-transition="slide">Back</a>
 			</div>
 
 			<div data-role="content">
