@@ -50,3 +50,7 @@ label {
 	height: 200px; 
 	margin: 0 auto;
 }
+
+.no-result {
+	display: none;
+}

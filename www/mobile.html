@@ -14,7 +14,7 @@
 				<h1><span>Filmo</span><span class="light">Meter</span></h1>
 			</div>
 
-			<div data-role="content" data-theme="b">
+			<div data-role="content">
 				<input type="search" class="keyword" placeholder="Movie title" />
 				<ul data-role="listview" data-inset="true" class="result">
 					<li>
@@ -24,6 +24,9 @@
 							(<span data-bind="text: $root.ratings()[0].year"></span>)
 						</a>
 					</li>
+				</ul>
+				<ul class="no-result">
+					<img src="/img/no_result.jpg"></img>
 				</ul>
 			</div>
 
@@ -44,44 +47,28 @@
 
 			<div data-role="content">
 				<div id="gauge"></div>
+				<div data-role="collapsible" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
+					<h3>
+						<label>Average Rating:</label>
+						<span data-bind="text: averageRating"></span>
+					</h3>
+					<p>
+						<ul data-role="listview" data-inset="true" data-bind="foreach: ratings">
+							<li>
+								<label data-bind="text: source"></label> 
+								<span data-bind="text: rating"></span>
+							</li>
+						</ul>
+					</p>
+				</div>
 				<ul data-role="listview" data-inset="true">
 					<li>
 						<label>Actors:</label>
 						<span data-bind="text: $root.ratings()[0].actors"></span>
 					</li>
 					<li>
-						<a href="#ratings-page" data-transition="slide">
-							<label>Rating:</label>
-							<span data-bind="text: averageRating"></span>
-						</a>
-					</li>
-					<li>
 						<label>Verdict:</label>
 						<span data-bind="text: verdict"></span>
-					</li>
-				</ul>
-    		</div>
-
-			<div data-role="footer" data-theme="b">
-				<span class="source"><a href="https://github.com/safwank/FilmoMeterMachine" target="_blank">Source code</a></span>
-				<span class="copyright">© 2012 <a href="mailto:shaihulud@alumni.cmu.edu?Subject=FilmoMeter%20rocks">Safwan Kamarrudin</a></span>
-			</div>
-		</div>
-
-		<div data-role="page" data-theme="b" id="ratings-page">
-			<div data-role="header" data-theme="b">
-				<h1>
-					<span data-bind="text: $root.ratings()[0].title"></span>
-					(<span data-bind="text: $root.ratings()[0].year"></span>)
-				</h1>
-				<a data-role="button" data-direction="reverse" data-rel="back" href="#ratings-page" data-icon="arrow-l" data-iconpos="left" data-transition="slide">Back</a>
-			</div>
-
-			<div data-role="content">
-				<ul data-role="listview" data-inset="true" data-bind="foreach: ratings">
-					<li>
-						<span data-bind="text: source"></span> -
-						<span data-bind="text: rating"></span>
 					</li>
 				</ul>
     		</div>
@@ -105,8 +92,7 @@
 				var viewModel = {};
 				var keyword = $('.keyword');
   				var result = $('.result');
-  				//var noResult = $('.no-result');
-  				//var individualResults = $('.individual-results');
+  				var noResult = $('.no-result');
   				var individualResultsShown = false;
   				var bindingsApplied = false;
 
@@ -115,12 +101,11 @@
   				search = function() {
   					if (keyword.val() != '') {
   						showSpinner();
-						//resetView();
+						resetView();
 
 						$.getJSON('/search?title=' + keyword.val(), function(data) {
 							hideSpinner();
 							bindToViewModel(data);
-							updateMeter(data.averageRating);
 						});
 					}
   				};
@@ -136,12 +121,11 @@
   				resetView = function() {
 					result.slideUp();
 					noResult.slideUp();
-					resetIndividualResults();
   				};
 
   				bindToViewModel = function(data) {
   					if (data == null) {
-						//noResult.slideDown();
+						noResult.slideDown();
 					} else {
 						result.slideDown();
 								
@@ -152,6 +136,8 @@
 						} else {
 							ko.mapping.fromJS(data, viewModel);
 						}
+
+						updateMeter(data.averageRating);
 					}
   				};
 
@@ -185,8 +171,6 @@
 				/* Events */
 				
 				keyword.keypress(searchIfEnterIsPressed);
-
-				//$('.result a').click(toggleIndividualResultsDisplay);
 
 				/* Frakking meter! */
 
@@ -280,7 +264,7 @@
 			            name: 'Rating',
 			            data: [8],
 			            tooltip: {
-			                valueSuffix: ' km/h'
+			                valueSuffix: '/10'
 			            }
 			        }],
 
@@ -289,15 +273,6 @@
 			        }
 			    }); 
 			});
-
-			/*
-			$(document).live('pagebeforechange', function() {
-				$('[data-role=footer]').hide();
-			});
-
-			$(document).live('pagechange', function() {
-				$('[data-role=footer]').show();
-			});*/
 		</script>
 	</body>
 </html>
