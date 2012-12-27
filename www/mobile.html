@@ -17,35 +17,40 @@
 
 			<div data-role="content">
 				<input type="search" class="keyword" placeholder="Movie title" />
-				<fieldset class="ui-grid-a, result">
-					<div class="ui-block-a">
-						<img class="poster" data-bind="attr:{src: $root.ratings()[1].poster}"></img>
-					</div>
-					<div class="ui-block-b">
-						<ul data-role="listview">
-							<li>
-								<label>Title:</label>
-								<span data-bind="text: $root.ratings()[0].title"></span>
-							</li>
-							<li>
-								<label>Year:</label>
-								<span data-bind="text: $root.ratings()[0].year"></span>
-							</li>
-							<li>
-								<label>Actors:</label>
-								<span data-bind="text: $root.ratings()[0].actors"></span>
-							</li>
-							<li>
-								<label>Rating:</label>
-								<span data-bind="text: averageRating"></span>
-							</li>
-							<li>
-								<label>Verdict: </label>
-								<span data-bind="text: verdict"></span>
-							</li>
-						</ul>
-					</div>
-				</fieldset>
+				<ul data-role="listview" data-inset="true" class="result">
+					
+					<li>
+						<a href="#">
+						<img class="ui-li-thumb poster" data-bind="attr:{src: $root.ratings()[1].poster}"></img>
+						<span data-bind="text: $root.ratings()[0].title"></span>
+						(<span data-bind="text: $root.ratings()[0].year"></span>)
+						</a>
+					</li>
+				</ul>
+				<!--div class="ui-block-b">
+					<ul data-role="listview">
+						<li>
+							<label>Title:</label>
+							<span data-bind="text: $root.ratings()[0].title"></span>
+						</li>
+						<li>
+							<label>Year:</label>
+							<span data-bind="text: $root.ratings()[0].year"></span>
+						</li>
+						<li>
+							<label>Actors:</label>
+							<span data-bind="text: $root.ratings()[0].actors"></span>
+						</li>
+						<li>
+							<label>Rating:</label>
+							<span data-bind="text: averageRating"></span>
+						</li>
+						<li>
+							<label>Verdict: </label>
+							<span data-bind="text: verdict"></span>
+						</li>
+					</ul>
+				</div-->
 			</div>
 
 			<div data-role="footer">
