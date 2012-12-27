@@ -54,3 +54,7 @@ label {
 .no-result {
 	display: none;
 }
+
+.dontmesswithmywrap {
+  white-space: normal;
+}

@@ -20,8 +20,10 @@
 					<li>
 						<a href="#detail-page" data-transition="slide">
 							<img class="ui-li-thumb poster" data-bind="attr:{src: $root.ratings()[1].poster}"></img>
-							<span data-bind="text: $root.ratings()[0].title"></span>
-							(<span data-bind="text: $root.ratings()[0].year"></span>)
+							<div class="dontmesswithmywrap">
+								<span data-bind="text: $root.ratings()[0].title"></span>
+								(<span data-bind="text: $root.ratings()[0].year"></span>)
+							</div>
 						</a>
 					</li>
 				</ul>
@@ -41,7 +43,7 @@
 
 		<div data-role="page" data-theme="b" id="detail-page">
 			<div data-role="header" data-theme="b">
-				<h1>
+				<h1 style="white-space:normal">
 					<span data-bind="text: $root.ratings()[0].title"></span>
 					(<span data-bind="text: $root.ratings()[0].year"></span>)
 				</h1>
