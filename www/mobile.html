@@ -174,7 +174,11 @@
 				};
 
 				updateMeter = function(value) {
-					chart.series[0].points[0].update(viewModel.averageRating());
+					var point = chart.series[0].points[0];
+					point.update(
+						viewModel.averageRating(),
+						true, 
+						{duration: 800});
 				};
 
 				/* Events */
