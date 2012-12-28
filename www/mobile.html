@@ -184,23 +184,10 @@
 				/* Events */
 				
 				keyword.keypress(searchIfEnterIsPressed);
-
-				/*
+				
 				$(document).live('pagechange', function() {
 					updateMeter();
-				});*/
-
-				$(document).live( 'pagebeforechange', function() {
-					// hide footer
-				  	$('[data-role=footer]').hide();
 				});
-
-				$(document).live( 'pagechange', function() {
-				  	// show footer
-				  	$('[data-role=footer]').show();
-				});
-
-				/* Frakking meter! */
 
 				var chart = new Highcharts.Chart({
 			        chart: {
