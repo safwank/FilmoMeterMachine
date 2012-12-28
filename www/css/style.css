@@ -460,3 +460,10 @@ img.poster {
 .individual-results {
   display: none;
 }
+
+#gauge {
+  width: 300px; 
+  height: 200px; 
+  margin: 0 auto;
+  float: left;
+}
