@@ -42,10 +42,20 @@ combine_results(Results) ->
 			Ratings = [M#movie.rating || M <- FilteredResults, M#movie.rating > 0],
 		    AverageRating = filmo_utils:round_rating(filmo_utils:average(Ratings)),
 		    Verdict = get_verdict_for(AverageRating),
+
+		    %% Heroku doesn't like images from OMDB for some reason, so default to the second source
+		    Poster = if
+				    	length(FilteredResults) =< 1 ->
+				    		"/img/no_result.jpg";
+				    	true ->
+				    		SecondResult = lists:nth(2, FilteredResults),
+				    		SecondResult#movie.poster
+				     end,
 		    
 		    ConvertedResults = [{struct, filmo_utils:movie_to_proplist(Movie)} || Movie <- FilteredResults],
 		    CombinedResult = {struct, [{"averageRating", AverageRating}, 
 		    						   {"verdict", Verdict},
+		    						   {"poster", Poster},
 		    						   {"ratings", {array, ConvertedResults}}]},
 		    mochijson:encode(CombinedResult)
 	end.
