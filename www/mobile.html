@@ -155,19 +155,9 @@
   				searchIfEnterIsPressed = function(e) {
 					if (e.which == 13) {
 						search();
+						keyword.blur();
 					}
   				};
-
-  				toggleIndividualResultsDisplay = function(e) {
-					e.preventDefault();
-
-					if (individualResultsShown) {
-						resetIndividualResults();
-					} else {
-						individualResults.slideDown();
-						individualResultsShown = true;
-					}
-				}
 
 				resetMeter = function() {
 					chart.series[0].points[0].update(0);
