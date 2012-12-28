@@ -18,7 +18,7 @@
 				<input type="search" class="keyword" placeholder="Movie title" />
 				<ul data-role="listview" data-inset="true" class="result">
 					<li>
-						<a href="#detail-page" data-transition="slide">
+						<a href="#detail-page" data-transition="flip">
 							<img class="ui-li-thumb poster" data-bind="attr:{src: poster}"></img>
 							<div class="dontmesswithmywrap">
 								<span data-bind="text: $root.ratings()[0].title"></span>
@@ -47,7 +47,7 @@
 					<span data-bind="text: $root.ratings()[0].title"></span>
 					(<span data-bind="text: $root.ratings()[0].year"></span>)
 				</h1>
-				<a data-role="button" data-direction="reverse" data-rel="back" href="#search-page" data-icon="arrow-l" data-iconpos="left" data-transition="slide">Back</a>
+				<a data-role="button" data-direction="reverse" data-rel="back" href="#search-page" data-icon="arrow-l" data-iconpos="left" data-transition="flip">Back</a>
 			</div>
 
 			<div data-role="content">
