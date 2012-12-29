@@ -50,21 +50,19 @@
 				<a data-role="button" data-direction="reverse" data-rel="back" href="#search-page" data-icon="arrow-l" data-iconpos="left" data-transition="flip">Back</a>
 			</div>
 
-			<div data-role="content">
+			<div data-role="content" class="details">
 				<div id="gauge"></div>
-				<div data-role="collapsible" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
-					<h3>
+				<div data-role="collapsible" data-content-theme="c">
+					<h2>
 						<label>Average Rating:</label>
 						<span data-bind="text: averageRating"></span>
-					</h3>
-					<p>
-						<ul data-role="listview" data-inset="true" data-bind="foreach: ratings">
-							<li>
-								<label data-bind="text: source"></label> 
-								<span data-bind="text: rating"></span>
-							</li>
-						</ul>
-					</p>
+					</h2>
+					<ul data-role="listview" data-bind="foreach: ratings">
+						<li>
+							<label data-bind="text: source"></label>:
+							<span data-bind="text: rating"></span>
+						</li>
+					</ul>
 				</div>
 				<ul data-role="listview" data-inset="true">
 					<li>

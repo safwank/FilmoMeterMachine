@@ -57,6 +57,10 @@ img {
   white-space: normal;
 }
 
+.details {
+  font-size: 90%;
+}
+
 #gauge {
   width: 300px; 
   height: 200px; 
