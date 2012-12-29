@@ -7,12 +7,22 @@
 
 -include("movie.hrl").
 
-get_result(SearchTitle) ->
+get_result(Criteria) ->
 	APIKey = "8abd8211399f1196bdefef458fc4c5ed",
-	EncodedTitle = mochiweb_util:urlencode([{"query", SearchTitle}]),
-	RequestUri = lists:flatten(
+
+	SearchTitle = proplists:get_value("title", Criteria),
+	EncodedTitle = mochiweb_util:urlencode([{"query", SearchTitle}]),	
+	SearchYear = proplists:get_value("year", Criteria),	
+
+	BaseUri = lists:flatten(
 				 	io_lib:format("http://api.themoviedb.org/3/search/movie?api_key=~s&~s", 
 						          [APIKey, EncodedTitle])),
+	RequestUri = case SearchYear of
+				 	undefined -> 
+				 		BaseUri;
+				 	_ -> 
+				 		BaseUri ++ "&year=" ++ SearchYear
+				 end,
 
 	{ok, RequestId} = httpc:request(get, {RequestUri, [{"Accept", "application/json"}]}, [], [{sync, false}]),
 	Result = http_utils:wait_for_response(RequestId),

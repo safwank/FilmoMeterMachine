@@ -16,17 +16,17 @@ content_types_provided(ReqData, Context) ->
 
 to_json(ReqData, Context) ->
     Title = wrq:get_qs_value("title", ReqData),
-    %% TODO: Include year
-    Results = get_results_for(Title),
+    Year = wrq:get_qs_value("year", ReqData),
+    Results = get_results_for([{"title", Title}, {"year", Year}]),
     CombinedResult = combine_results(Results),
     SerializedResult = serializer:serialize(CombinedResult, json),
     {SerializedResult, ReqData, Context}.
 
-get_results_for(Title) ->
+get_results_for(Criteria) ->
 	%% TODO: Figure out how to retrieve results from a dynamic list of sources
-    OMDBResult = omdb_source:get_result(Title),
-    FlixsterResult = flixster_source:get_result(Title),
-    TMDBResult = tmdb_source:get_result(Title),
+    OMDBResult = omdb_source:get_result(Criteria),
+    FlixsterResult = flixster_source:get_result(Criteria),
+    TMDBResult = tmdb_source:get_result(Criteria),
     OMDBResult++FlixsterResult++TMDBResult.
 
 combine_results(Results) ->

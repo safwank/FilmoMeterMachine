@@ -7,9 +7,18 @@
 
 -include("movie.hrl").
 
-get_result(SearchTitle) ->
+get_result(Criteria) ->
+	SearchTitle = proplists:get_value("title", Criteria),
 	EncodedTitle = mochiweb_util:urlencode([{"t", SearchTitle}]),
-    RequestUri = string:concat("http://www.omdbapi.com/?", EncodedTitle),
+	SearchYear = proplists:get_value("year", Criteria),
+
+	BaseUri = "http://www.omdbapi.com/?" ++ EncodedTitle,
+    RequestUri = case SearchYear of 
+    				undefined -> 
+    					BaseUri;
+    				_ -> 
+    					BaseUri ++ "&y=" ++ SearchYear
+    			 end,
     {ok, RequestId} = httpc:request(get, {RequestUri, []}, [], [{sync, false}]),
     Result = http_utils:wait_for_response(RequestId),
 
@@ -19,7 +28,7 @@ get_result(SearchTitle) ->
     case ParsedJsonResult of 
     	{struct, [{_, _Response}, {_, _Error}]} -> [];
     	ParsedJsonResult ->
-		    {_, [{_, Title}, {_,Year}, _Rated, _Released, _Runtime, {_, Genre},
+		    {_, [{_, Title}, {_, Year}, _Rated, _Released, _Runtime, {_, Genre},
 			     _Director, _Writer, {_, Actors}, {_, Plot}, {_, Poster}, {_, Rating},
 			     _Votes, _ID, _Response]} = ParsedJsonResult,
 
