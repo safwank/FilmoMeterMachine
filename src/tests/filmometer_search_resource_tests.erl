@@ -15,7 +15,7 @@ combine_results_should_return_an_empty_list_if_there_is_no_result_from_omdb_test
 	Actual = filmometer_search_resource:combine_results([#movie{source="Flixster"}]),
 	?assert(Actual =:= Expected).
 
-combined_results_should_return_a_list_of_aggregated_results_if_there_is_a_result_from_omdb_test() ->
+combine_results_should_return_a_list_of_aggregated_results_if_there_is_a_result_from_omdb_test() ->
 	PropLists = [{struct, [{source,"OMDB"}, {title,"Sicko"}, {year,2007}, 
 						   {actors,"John Doe, Jane Doe"},
 						   {poster,"foo.bar/omdb.jpg"}, {rating,8.8}]}, 
