@@ -18,7 +18,7 @@ get_result(SearchTitle) ->
 	Result = http_utils:wait_for_response(RequestId),
 
 	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
-	ParsedJsonResult = mochijson:decode(Body),
+	ParsedJsonResult = serializer:deserialize(Body, json),
 	{struct, [_Total, {_Movies, {array, Movies}}, _Links, _LinkTemplate]} = ParsedJsonResult,
 	build_result_from(Movies).
 

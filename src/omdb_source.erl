@@ -14,7 +14,7 @@ get_result(SearchTitle) ->
     Result = http_utils:wait_for_response(RequestId),
 
     {{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
-    ParsedJsonResult = mochijson:decode(Body),
+    ParsedJsonResult = serializer:deserialize(Body, json),
 
     case ParsedJsonResult of 
     	{struct, [{_, _Response}, {_, _Error}]} -> [];

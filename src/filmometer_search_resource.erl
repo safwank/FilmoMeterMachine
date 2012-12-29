@@ -19,7 +19,8 @@ to_json(ReqData, Context) ->
     %% TODO: Include year
     Results = get_results_for(Title),
     CombinedResult = combine_results(Results),
-    {CombinedResult, ReqData, Context}.
+    SerializedResult = serializer:serialize(CombinedResult, json),
+    {SerializedResult, ReqData, Context}.
 
 get_results_for(Title) ->
 	%% TODO: Figure out how to retrieve results from a dynamic list of sources
@@ -53,11 +54,10 @@ combine_results(Results) ->
 				     end,
 		    
 		    ConvertedResults = [{struct, filmo_utils:movie_to_proplist(Movie)} || Movie <- FilteredResults],
-		    CombinedResult = {struct, [{"averageRating", AverageRating}, 
-		    						   {"verdict", Verdict},
-		    						   {"poster", Poster},
-		    						   {"ratings", {array, ConvertedResults}}]},
-		    mochijson:encode(CombinedResult)
+		    {struct, [{"averageRating", AverageRating}, 
+				      {"verdict", Verdict},
+				      {"poster", Poster},
+				      {"ratings", {array, ConvertedResults}}]}
 	end.
 
 get_verdict_for(Score) ->
