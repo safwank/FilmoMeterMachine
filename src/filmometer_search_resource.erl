@@ -3,7 +3,7 @@
 %% @doc Look up movie ratings and average them out.
 
 -module(filmometer_search_resource).
--export([init/1, content_types_provided/2, to_json/2]).
+-export([init/1, content_types_provided/2, to_json/2, combine_results/1, get_verdict_for/1]).
 
 -include_lib("webmachine/include/webmachine.hrl").
 -include("movie.hrl").
