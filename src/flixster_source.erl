@@ -34,7 +34,7 @@ build_result_from(Movies) ->
 			CombinedActors = string:join(Actors, ", "),
 
 			{struct, Posters} = proplists:get_value("posters", Movie),
-			OriginalPoster = proplists:get_value("original", Posters),
+			DetailedPoster = proplists:get_value("detailed", Posters),
 
 			{struct, Ratings} = proplists:get_value("ratings", Movie),
 			CriticsScore = proplists:get_value("critics_score", Ratings),
@@ -42,7 +42,7 @@ build_result_from(Movies) ->
 			AverageRating = (CriticsScore + AudienceScore) / 2 / 10,
 
 			[#movie{source="Flixster", title=Title, year=Year, actors=CombinedActors,
-					poster=OriginalPoster, rating=AverageRating}] ++ MovieAcc
+					poster=DetailedPoster, rating=AverageRating}] ++ MovieAcc
 		end,
 	
 	MovieList = lists:foldl(CreateMovieFun, [], Movies),
