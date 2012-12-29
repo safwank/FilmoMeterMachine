@@ -15,7 +15,7 @@
 			</div>
 
 			<div data-role="content">
-				<input type="search" class="keyword" placeholder="Movie title" />
+				<input type="search" class="keyword" placeholder="Title, year" />
 				<ul data-role="listview" data-inset="true" class="result">
 					<li>
 						<a href="#detail-page" data-transition="flip">
@@ -115,12 +115,26 @@
   						showSpinner();
 						resetView();
 
-						$.getJSON('/search?title=' + keyword.val(), function(data) {
+						$.getJSON(getSearchURI(), function(data) {
 							bindToViewModel(data);
 							hideSpinner();
 						});
 					}
   				};
+
+  				getSearchURI = function() {
+  					var criteria = keyword.val().split(',');
+  					var query;
+
+  					if (criteria.length === 2) {
+  						query = $.param({title: criteria[0].trim(), year: criteria[1].trim()});
+  					}
+  					else {
+  						query = $.param({title: criteria[0].trim()});
+  					}
+
+  					return '/search?'.concat(query);
+  				},
 
   				showSpinner = function() {
   					$.mobile.showPageLoadingMsg();
