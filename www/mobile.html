@@ -66,12 +66,20 @@
 				</div>
 				<ul data-role="listview" data-inset="true">
 					<li>
+						<label>Verdict:</label>
+						<span data-bind="text: verdict"></span>
+					</li>
+					<li>
 						<label>Actors:</label>
 						<span data-bind="text: $root.ratings()[0].actors"></span>
 					</li>
 					<li>
-						<label>Verdict:</label>
-						<span data-bind="text: verdict"></span>
+						<label>Genre:</label>
+						<span data-bind="text: genre"></span>
+					</li>
+					<li>
+						<label>Plot:</label>
+						<span data-bind="text: plot"></span>
 					</li>
 				</ul>
     		</div>

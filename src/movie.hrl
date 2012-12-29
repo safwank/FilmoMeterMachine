@@ -1,1 +1,1 @@
--record(movie, {source,title,year,actors,poster,rating}).
+-record(movie, {source,title,year,actors,poster,rating,genre,plot}).

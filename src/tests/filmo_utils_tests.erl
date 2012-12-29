@@ -47,17 +47,18 @@ average_should_return_the_average_of_a_list_of_numbers_test() ->
 	?assert(Average =:= 10.75).
 
 movie_to_proplist_should_return_an_empty_proplist_if_movie_is_empty_test() ->
-	Expected = [{source,undefined},{title,undefined},{year,undefined},{actors,undefined},{poster,undefined},{rating,undefined}],
+	Expected = [{source,undefined},{title,undefined},{year,undefined},{actors,undefined},
+				{poster,undefined},{rating,undefined},{genre,undefined},{plot,undefined}],
 	Actual = filmo_utils:movie_to_proplist(#movie{}),
 	?assert(Actual =:= Expected).
 
 movie_to_proplist_should_return_a_valid_proplist_with_values_if_movie_is_not_empty_test() ->
 	Expected = [{source, "OMDB"}, {title, "Fubar"}, {year, 2012}, 
 				{actors, "John Doe, Jane Doe"}, {poster, "http://fu.bar/com.jpg"},
-				{rating, 6.66}],
+				{rating, 6.66}, {genre, "Comedy"}, {plot, "Some plot"}],
 	Actual = filmo_utils:movie_to_proplist(
 		#movie{source="OMDB", title="Fubar", year=2012, actors="John Doe, Jane Doe",
-			   poster="http://fu.bar/com.jpg", rating=6.66}),
+			   poster="http://fu.bar/com.jpg", rating=6.66, genre="Comedy", plot="Some plot"}),
 	?assert(Actual =:= Expected).
 
 -endif.

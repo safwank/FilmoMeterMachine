@@ -52,11 +52,16 @@ combine_results(Results) ->
 				    		SecondResult = lists:nth(2, FilteredResults),
 				    		SecondResult#movie.poster
 				     end,
+
+			Genre = AuthoritativeSource#movie.genre,
+			Plot = AuthoritativeSource#movie.plot,
 		    
 		    ConvertedResults = [{struct, filmo_utils:movie_to_proplist(Movie)} || Movie <- FilteredResults],
 		    {struct, [{"averageRating", AverageRating}, 
 				      {"verdict", Verdict},
 				      {"poster", Poster},
+				      {"genre", Genre},
+				      {"plot", Plot},
 				      {"ratings", {array, ConvertedResults}}]}
 	end.
 

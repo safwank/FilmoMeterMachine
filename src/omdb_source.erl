@@ -19,8 +19,8 @@ get_result(SearchTitle) ->
     case ParsedJsonResult of 
     	{struct, [{_, _Response}, {_, _Error}]} -> [];
     	ParsedJsonResult ->
-		    {_, [{_, Title}, {_,Year}, _Rated, _Released, _Runtime, _Genre,
-			     _Director, _Writer, {_, Actors}, _Plot, {_, Poster}, {_, Rating},
+		    {_, [{_, Title}, {_,Year}, _Rated, _Released, _Runtime, {_, Genre},
+			     _Director, _Writer, {_, Actors}, {_, Plot}, {_, Poster}, {_, Rating},
 			     _Votes, _ID, _Response]} = ParsedJsonResult,
 
 			{ConvertedYear, _} = string:to_integer(Year),
@@ -28,5 +28,6 @@ get_result(SearchTitle) ->
 		    				  	{error,_} -> 0;
 		    				  	{R, _} -> R
 		    				  end,
-		    [#movie{source="OMDB", title=Title, year=ConvertedYear, actors=Actors, poster=Poster, rating=ConvertedRating}]
+		    [#movie{source="OMDB", title=Title, year=ConvertedYear, actors=Actors, 
+		            poster=Poster, rating=ConvertedRating, genre=Genre, plot=Plot}]
 	end.
