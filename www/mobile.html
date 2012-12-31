@@ -152,7 +152,7 @@
   				};
 
   				bindToViewModel = function(data) {
-  					if (data == null) {
+  					if (data == null || data === "") {
 						noResult.slideDown();
 					} else {
 						result.slideDown();
