@@ -6,3 +6,5 @@ deps
 ebin
 priv/log
 undefined
+.idea/
+*.iml
