@@ -33,6 +33,12 @@
 						<span>I haz sad panda :(</span>
 					</li>
 				</ul>
+				<ul data-role="listview" data-inset="true" class="error-result">
+					<li data-mini="true">
+						<img src="/img/no_result.jpg" class="ui-li-thumb"></img>
+						<span>An unexpected error has occured :(</span>
+					</li>
+				</ul>
 			</div>
 
 			<div data-role="footer" data-theme="b">
@@ -104,6 +110,7 @@
 				var keyword = $('.keyword');
   				var result = $('.result');
   				var noResult = $('.no-result');
+  				var errorResult = $('.error-result');
   				var poster = $('.poster');
   				var individualResultsShown = false;
   				var bindingsApplied = false;
@@ -115,8 +122,14 @@
   						showSpinner();
 						resetView();
 
-						$.getJSON(getSearchURI(), function(data) {
+						$.getJSON(getSearchURI())
+						.success(function(data) {
 							bindToViewModel(data);
+						})
+						.error(function() {
+							errorResult.slideDown();
+						})
+						.complete(function() {
 							hideSpinner();
 						});
 					}
@@ -147,6 +160,7 @@
   				resetView = function() {
 					result.slideUp();
 					noResult.slideUp();
+					errorResult.slideUp();
 					resetMeter();
 					poster.attr('src', '');
   				};
