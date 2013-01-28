@@ -3,11 +3,11 @@
 %% @doc Flixster source.
 
 -module(flixster_source).
--export([get_result/1]).
+-export([get_result/2]).
 
 -include("movie.hrl").
 
-get_result(Criteria) ->
+get_result(Criteria, Pid) ->
 	APIKey = "b2x78beenefg6tq3ynr56r4a",
 	PageLimit = 5,
 
@@ -17,13 +17,12 @@ get_result(Criteria) ->
 	RequestUri = lists:flatten(
 				 	io_lib:format("http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=~s&page_limit=~p&~s", 
 						          [APIKey, PageLimit, EncodedTitle])),
-	{ok, RequestId} = httpc:request(get, {RequestUri, []}, [], [{sync, false}]),
-	Result = http_utils:wait_for_response(RequestId),
+	{ok, Result} = httpc:request(get, {RequestUri, []}, [], [{sync, true}]),
 
 	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
 	ParsedJsonResult = serializer:deserialize(Body, json),
 	{struct, [_Total, {_Movies, {array, Movies}}, _Links, _LinkTemplate]} = ParsedJsonResult,
-	build_result_from(Movies).
+	Pid ! build_result_from(Movies).
 
 build_result_from(Movies) ->
 	CreateMovieFun = 

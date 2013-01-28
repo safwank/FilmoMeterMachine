@@ -3,11 +3,11 @@
 %% @doc TMDB source.
 
 -module(tmdb_source).
--export([get_result/1]).
+-export([get_result/2]).
 
 -include("movie.hrl").
 
-get_result(Criteria) ->
+get_result(Criteria, Pid) ->
 	APIKey = "8abd8211399f1196bdefef458fc4c5ed",
 
 	SearchTitle = proplists:get_value("title", Criteria),
@@ -23,14 +23,12 @@ get_result(Criteria) ->
 				 	_ -> 
 				 		BaseUri ++ "&year=" ++ SearchYear
 				 end,
-
-	{ok, RequestId} = httpc:request(get, {RequestUri, [{"Accept", "application/json"}]}, [], [{sync, false}]),
-	Result = http_utils:wait_for_response(RequestId),
+	{ok, Result} = httpc:request(get, {RequestUri, [{"Accept", "application/json"}]}, [], [{sync, true}]),
 
 	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
 	ParsedJsonResult = serializer:deserialize(Body, json),
 	{struct, [_Page, {_Results, {array, Results}}, _TotalPages, _TotalResults]} = ParsedJsonResult,
-	build_result_from(Results).
+	Pid ! build_result_from(Results).
 
 build_result_from(Results) ->
 	PosterBaseUri = "http://cf2.imgobject.com/t/p/w185/",

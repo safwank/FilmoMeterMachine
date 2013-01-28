@@ -24,10 +24,23 @@ to_json(ReqData, Context) ->
 
 get_results_for(Criteria) ->
 	%% TODO: Figure out how to retrieve results from a dynamic list of sources
-    OMDBResult = omdb_source:get_result(Criteria),
-    FlixsterResult = flixster_source:get_result(Criteria),
-    TMDBResult = tmdb_source:get_result(Criteria),
-    OMDBResult++FlixsterResult++TMDBResult.
+	Pid = self(),
+    spawn(omdb_source, get_result, [Criteria, Pid]),
+    spawn(flixster_source, get_result, [Criteria, Pid]),
+    spawn(tmdb_source, get_result, [Criteria, Pid]),
+    Results = wait_for_responses(3, []),
+    Results.
+
+wait_for_responses(Count, Results) ->
+	case Count of
+		0 -> Results;
+		_ ->
+			receive
+				Result -> wait_for_responses(Count-1, Results++Result)
+			after 
+		 		5000 -> timeout 
+		 	end
+	end.
 
 combine_results(Results) ->
 	case [OMDBSource || OMDBSource = #movie{source="OMDB"} <- Results] of
