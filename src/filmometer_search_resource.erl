@@ -57,6 +57,9 @@ combine_results(Results) ->
 		    AverageRating = filmo_utils:round_rating(filmo_utils:average(Ratings)),
 		    Verdict = get_verdict_for(AverageRating),
 
+		    NonEmptyActorsFun = fun(M) -> M#movie.actors =/= [] end,
+		    Actors = lists:nth(1, [M#movie.actors || M <- Results, NonEmptyActorsFun(M)]),
+
 		    %% Heroku doesn't like images from OMDB for some reason, so default to the second source
 		    Poster = if
 				    	length(FilteredResults) =< 1 ->
@@ -71,6 +74,7 @@ combine_results(Results) ->
 		    
 		    ConvertedResults = [{struct, filmo_utils:movie_to_proplist(Movie)} || Movie <- FilteredResults],
 		    {struct, [{"averageRating", AverageRating}, 
+		    		  {"actors", Actors},
 				      {"verdict", Verdict},
 				      {"poster", Poster},
 				      {"genre", Genre},
