@@ -60,13 +60,13 @@ combine_results(Results) ->
 		    NonEmptyActorsFun = fun(M) -> M#movie.actors =/= [] end,
 		    Actors = lists:nth(1, [M#movie.actors || M <- FilteredResults, NonEmptyActorsFun(M)]),
 
-		    %% Heroku doesn't like images from OMDB for some reason, so default to the second source
+		    %% Heroku doesn't like images from OMDB for some reason, so default to the first non-empty poster
 		    Poster = if
 				    	length(FilteredResults) =< 1 ->
 				    		"/img/no_result.jpg";
 				    	true ->
-				    		SecondResult = lists:nth(2, FilteredResults),
-				    		SecondResult#movie.poster
+				    		PosterFun = fun(M) -> M#movie.source =/= "OMDB" andalso M#movie.source =/= [] end,
+				    		lists:nth(1, [M#movie.poster || M <- FilteredResults, PosterFun(M)])
 				     end,
 
 			Genre = AuthoritativeSource#movie.genre,
