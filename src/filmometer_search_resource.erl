@@ -58,7 +58,7 @@ combine_results(Results) ->
 		    Verdict = get_verdict_for(AverageRating),
 
 		    NonEmptyActorsFun = fun(M) -> M#movie.actors =/= [] end,
-		    Actors = lists:nth(1, [M#movie.actors || M <- Results, NonEmptyActorsFun(M)]),
+		    Actors = lists:nth(1, [M#movie.actors || M <- FilteredResults, NonEmptyActorsFun(M)]),
 
 		    %% Heroku doesn't like images from OMDB for some reason, so default to the second source
 		    Poster = if
