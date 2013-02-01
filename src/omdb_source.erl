@@ -25,7 +25,8 @@ get_result(Criteria, Pid) ->
     ParsedJsonResult = serializer:deserialize(Body, json),
 
     case ParsedJsonResult of 
-    	{struct, [{_, _Response}, {_, _Error}]} -> [];
+    	{struct, [{_, _Response}, {_, _Error}]} -> 
+    		Pid ! [];
     	ParsedJsonResult ->
 		    {_, [{_, Title}, {_, Year}, _Rated, _Released, _Runtime, {_, Genre},
 			     _Director, _Writer, {_, Actors}, {_, Plot}, {_, Poster}, {_, Rating},
