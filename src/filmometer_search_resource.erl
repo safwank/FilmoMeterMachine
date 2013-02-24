@@ -31,56 +31,60 @@ get_results_for(Criteria) ->
     Results = wait_for_responses(3, []),
     Results.
 
+wait_for_responses(0, Results) -> Results;
 wait_for_responses(Count, Results) ->
-	case Count of
-		0 -> Results;
-		_ ->
-			receive
-				Result -> wait_for_responses(Count-1, Results++Result)
-			after 
-		 		5000 -> timeout 
-		 	end
-	end.
+	receive
+		Result -> wait_for_responses(Count-1, Results++Result)
+	after 
+ 		5000 -> timeout 
+ 	end.
 
 combine_results(Results) ->
 	case [OMDBSource || OMDBSource = #movie{source="OMDB"} <- Results] of
 		[] -> [];
-		[AuthoritativeSource] ->
-			ReferenceTitle = AuthoritativeSource#movie.title,
-			ReferenceYear = AuthoritativeSource#movie.year,
-			FilterFun = fun(M, Title, Year) ->
-							(M#movie.title =:= Title) andalso (M#movie.year =:= Year)
-						end,
-			FilteredResults = [M || M <- Results, FilterFun(M, ReferenceTitle, ReferenceYear)],
-
-			Ratings = [M#movie.rating || M <- FilteredResults, M#movie.rating > 0],
-		    AverageRating = filmo_utils:round_rating(filmo_utils:average(Ratings)),
-		    Verdict = get_verdict_for(AverageRating),
-
-		    NonEmptyActorsFun = fun(M) -> M#movie.actors =/= [] end,
-		    Actors = lists:nth(1, [M#movie.actors || M <- FilteredResults, NonEmptyActorsFun(M)]),
-
-		    %% Heroku doesn't like images from OMDB for some reason, so default to the first non-empty poster
-		    Poster = if
-				    	length(FilteredResults) =< 1 ->
-				    		"/img/no_result.jpg";
-				    	true ->
-				    		PosterFun = fun(M) -> M#movie.source =/= "OMDB" andalso M#movie.source =/= [] end,
-				    		lists:nth(1, [M#movie.poster || M <- FilteredResults, PosterFun(M)])
-				     end,
-
-			Genre = AuthoritativeSource#movie.genre,
-			Plot = AuthoritativeSource#movie.plot,
-		    
-		    ConvertedResults = [{struct, filmo_utils:movie_to_proplist(Movie)} || Movie <- FilteredResults],
-		    {struct, [{"averageRating", AverageRating}, 
-		    		  {"actors", Actors},
-				      {"verdict", Verdict},
-				      {"poster", Poster},
-				      {"genre", Genre},
-				      {"plot", Plot},
-				      {"ratings", {array, ConvertedResults}}]}
+		AuthoritativeResults ->
+			CombinedResults = combine_results(AuthoritativeResults, Results, []),
+			{array, CombinedResults}
 	end.
+
+combine_results([], _, CombinedResults) -> CombinedResults;
+combine_results([H|T], AllResults, CombinedResults) ->
+	AuthoritativeSource = H,
+	ReferenceTitle = AuthoritativeSource#movie.title,
+	ReferenceYear = AuthoritativeSource#movie.year,
+	FilterFun = fun(M, Title, Year) ->
+					(M#movie.title =:= Title) andalso (M#movie.year =:= Year)
+				end,
+	FilteredResults = [M || M <- AllResults, FilterFun(M, ReferenceTitle, ReferenceYear)],
+
+	Ratings = [M#movie.rating || M <- FilteredResults, M#movie.rating > 0],
+    AverageRating = filmo_utils:round_rating(filmo_utils:average(Ratings)),
+    Verdict = get_verdict_for(AverageRating),
+
+    NonEmptyActorsFun = fun(M) -> M#movie.actors =/= [] end,
+    Actors = lists:nth(1, [M#movie.actors || M <- FilteredResults, NonEmptyActorsFun(M)]),
+
+    %% Heroku doesn't like images from OMDB for some reason, so default to the first non-empty poster
+    Poster = if
+		    	length(FilteredResults) =< 1 ->
+		    		"/img/no_result.jpg";
+		    	true ->
+		    		PosterFun = fun(M) -> M#movie.source =/= "OMDB" andalso M#movie.source =/= [] end,
+		    		lists:nth(1, [M#movie.poster || M <- FilteredResults, PosterFun(M)])
+		     end,
+
+	Genre = AuthoritativeSource#movie.genre,
+	Plot = AuthoritativeSource#movie.plot,
+    
+    ConvertedResults = [{struct, filmo_utils:movie_to_proplist(Movie)} || Movie <- FilteredResults],
+    Result = {struct, [{"averageRating", AverageRating}, 
+		    		   {"actors", Actors},
+				       {"verdict", Verdict},
+				       {"poster", Poster},
+				       {"genre", Genre},
+				       {"plot", Plot},
+					   {"ratings", {array, ConvertedResults}}]},
+	combine_results(T, AllResults, CombinedResults++[Result]).
 
 get_verdict_for(Score) ->
 	if

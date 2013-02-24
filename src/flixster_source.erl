@@ -9,7 +9,7 @@
 
 get_result(Criteria, Pid) ->
 	APIKey = "b2x78beenefg6tq3ynr56r4a",
-	PageLimit = 5,
+	PageLimit = 10,
 
 	SearchTitle = proplists:get_value("title", Criteria),
 	EncodedTitle = mochiweb_util:urlencode([{"q", SearchTitle}]),
