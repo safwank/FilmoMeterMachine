@@ -68,6 +68,11 @@ $(document).ready(function() {
 					
 			if (!bindingsApplied) {
 				viewModel = ko.mapping.fromJS(data);
+				viewModel.selected = ko.observable();
+				viewModel.changeSelected = function(movie) {
+					viewModel.selected(movie);
+					return true;
+				};
 				ko.applyBindings(viewModel);
 				bindingsApplied = true;
 			} else {
@@ -93,9 +98,11 @@ $(document).ready(function() {
 	};
 
 	updateMeter = function(value) {
+		if (!viewModel.selected) return;
+
 		var point = chart.series[0].points[0];
 		point.update(
-			viewModel.averageRating(),
+			viewModel.selected().averageRating(),
 			true, 
 			{duration: 800});
 	};

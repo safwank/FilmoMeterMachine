@@ -23,13 +23,13 @@
 
 			<div data-role="content">
 				<input type="search" class="keyword" placeholder="Title, year" />
-				<ul data-role="listview" data-inset="true" class="result">
+				<ul data-role="listview" data-inset="true" data-bind="foreach: movies" class="result">
 					<li>
-						<a href="#detail-page" data-transition="flip">
+						<a href="#detail-page" data-transition="flip" data-bind="click: $parent.changeSelected">
 							<img class="ui-li-thumb poster" data-bind="attr:{src: poster}"></img>
 							<div class="dontmesswithmywrap">
-								<span data-bind="text: $root.ratings()[0].title"></span>
-								(<span data-bind="text: $root.ratings()[0].year"></span>)
+								<span data-bind="text: ratings()[0].title"></span>
+								(<span data-bind="text: ratings()[0].year"></span>)
 							</div>
 						</a>
 					</li>
@@ -56,9 +56,9 @@
 
 		<div data-role="page" data-theme="b" id="detail-page">
 			<div data-role="header" data-theme="b">
-				<h1 style="white-space:normal">
-					<span data-bind="text: $root.ratings()[0].title"></span>
-					(<span data-bind="text: $root.ratings()[0].year"></span>)
+				<h1 style="white-space:normal" data-bind="with: selected">
+					<span data-bind="text: ratings()[0].title"></span>
+					(<span data-bind="text: ratings()[0].year"></span>)
 				</h1>
 				<a data-role="button" data-direction="reverse" data-rel="back" href="#search-page" data-icon="arrow-l" data-iconpos="left" data-transition="flip">Back</a>
 			</div>
@@ -67,30 +67,34 @@
 				<div id="gauge"></div>
 				<div data-role="collapsible" data-content-theme="c">
 					<h2>
-						<label>Average Rating:</label>
-						<span data-bind="text: averageRating"></span>
+						<div data-bind="with: selected">
+							<label>Average Rating:</label>
+							<span data-bind="text: averageRating"></span>
+						</div>
 					</h2>
-					<ul data-role="listview" data-bind="foreach: ratings">
-						<li>
-							<label data-bind="text: source"></label>:
-							<span data-bind="text: rating"></span>
-						</li>
-					</ul>
+					<div data-bind="with: selected">
+						<ul data-role="listview" data-bind="foreach: ratings">
+							<li>
+								<label data-bind="text: source"></label>:
+								<span data-bind="text: rating"></span>
+							</li>
+						</ul>
+					</div>
 				</div>
 				<ul data-role="listview" data-inset="true">
-					<li>
+					<li data-bind="with: selected">
 						<label>Verdict:</label>
 						<span data-bind="text: verdict"></span>
 					</li>
-					<li>
+					<li data-bind="with: selected">
 						<label>Actors:</label>
 						<span data-bind="text: actors"></span>
 					</li>
-					<li>
+					<li data-bind="with: selected">
 						<label>Genre:</label>
 						<span data-bind="text: genre"></span>
 					</li>
-					<li>
+					<li data-bind="with: selected">
 						<label>Plot:</label>
 						<span data-bind="text: plot"></span>
 					</li>
