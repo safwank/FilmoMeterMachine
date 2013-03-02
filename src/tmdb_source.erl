@@ -33,7 +33,7 @@ get_result(Criteria, Pid) ->
 build_result_from(Results) ->
 	PosterBaseUri = "http://cf2.imgobject.com/t/p/w185/",
 	Movies = 
-		[#movie{source="TMDB", title=Title, 
+		[#movie{source = "TMDB", title = Title, 
 				year = case ReleaseDate of
 					   		null -> 0;
 					   		ReleaseDate ->
@@ -42,7 +42,12 @@ build_result_from(Results) ->
 					   				{Year, _} -> Year
 					   			end
 					   end,
-				actors="", poster=string:concat(PosterBaseUri, Poster), rating=Rating}
+				actors = "", 
+				poster = case Poster of
+						 	null -> "";
+						 	_ -> string:concat(PosterBaseUri, Poster)
+						 end, 
+				rating = Rating}
 		|| {struct,[_Adult, _Backdrop, _Id, _OriginalTitle,
 					{_, ReleaseDate}, {_, Poster}, _Popularity,
 					{_, Title}, {_, Rating}, _Votes]} 
