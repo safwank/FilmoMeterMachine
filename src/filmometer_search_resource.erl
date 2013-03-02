@@ -44,7 +44,7 @@ combine_results(Results) ->
 		[] -> [];
 		AuthoritativeResults ->
 			CombinedResults = combine_results(AuthoritativeResults, Results, []),
-			{array, CombinedResults}
+			{struct, [{"movies", {array, CombinedResults}}]}
 	end.
 
 combine_results([], _, CombinedResults) -> CombinedResults;

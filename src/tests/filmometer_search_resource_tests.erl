@@ -24,13 +24,14 @@ combine_results_should_return_a_list_of_aggregated_results_if_there_is_a_result_
 				 		   {actors,"John Doe, Jane Doe"},
 				 		   {poster,"foo.bar/tmdb.jpg"}, {rating,9.0},
 				 		   {genre,"Documentary"}, {plot,"Michael Moore kicking ass"}]}],
-	Expected = {struct, [{"averageRating", 8.9},
-						 {"actors", "John Doe, Jane Doe"}, 
-				         {"verdict", "Hellz yeah!"},
-				         {"poster", "foo.bar/tmdb.jpg"},
-				         {"genre", "Documentary"},
-				         {"plot", "Michael Moore kicking ass"},
-				         {"ratings", {array, PropLists}}]},
+	Expected = {struct, [{"movies", {array, [{struct, [{"averageRating", 8.9},
+													   {"actors", "John Doe, Jane Doe"}, 
+												       {"verdict", "Hellz yeah!"},
+												       {"poster", "foo.bar/tmdb.jpg"},
+												       {"genre", "Documentary"},
+												       {"plot", "Michael Moore kicking ass"},
+												       {"ratings", {array, PropLists}}]}
+									]}}]},
 
 	Actual = filmometer_search_resource:combine_results(
 		[#movie{source="OMDB", title="Sicko", actors="John Doe, Jane Doe", 
