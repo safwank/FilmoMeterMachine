@@ -36,7 +36,7 @@ wait_for_responses(Count, Results) ->
 	receive
 		Result -> wait_for_responses(Count-1, Results++Result)
 	after 
- 		5000 -> timeout 
+ 		30000 -> timeout 
  	end.
 
 combine_results(Results) ->

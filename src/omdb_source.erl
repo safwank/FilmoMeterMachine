@@ -76,5 +76,5 @@ wait_for_movie_details_responses(Count, Results) ->
 	receive
 		Result -> wait_for_movie_details_responses(Count-1, Results++Result)
 	after 
- 		5000 -> timeout 
+ 		25000 -> timeout 
  	end.
