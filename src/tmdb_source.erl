@@ -15,14 +15,12 @@ get_result(Criteria, Pid) ->
 	SearchYear = proplists:get_value("year", Criteria),	
 
 	BaseUri = lists:flatten(
-				 	io_lib:format("http://api.themoviedb.org/3/search/movie?api_key=~s&~s", 
-						          [APIKey, EncodedTitle])),
+						 	io_lib:format("http://api.themoviedb.org/3/search/movie?api_key=~s&~s", 
+		          [APIKey, EncodedTitle])),
 	RequestUri = case SearchYear of
-				 	undefined -> 
-				 		BaseUri;
-				 	_ -> 
-				 		BaseUri ++ "&year=" ++ SearchYear
-				 end,
+								 	undefined -> BaseUri;
+								 	_ -> BaseUri ++ "&year=" ++ SearchYear
+							 end,
 	{ok, Result} = httpc:request(get, {RequestUri, [{"Accept", "application/json"}]}, [], [{sync, true}]),
 
 	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,
@@ -34,20 +32,20 @@ build_result_from(Results) ->
 	PosterBaseUri = "http://cf2.imgobject.com/t/p/w185/",
 	Movies = 
 		[#movie{source = "TMDB", title = Title, 
-				year = case ReleaseDate of
-					   		null -> 0;
-					   		ReleaseDate ->
-					   			case string:to_integer(string:substr(ReleaseDate, 1, 4)) of
-					   				{error, _} -> 0;
-					   				{Year, _} -> Year
-					   			end
-					   end,
-				actors = "", 
-				poster = case Poster of
-						 	null -> "";
-						 	_ -> string:concat(PosterBaseUri, Poster)
-						 end, 
-				rating = Rating}
+						year = case ReleaseDate of
+								   		null -> 0;
+								   		ReleaseDate ->
+								   			case string:to_integer(string:substr(ReleaseDate, 1, 4)) of
+								   				{error, _} -> 0;
+								   				{Year, _} -> Year
+								   			end
+								   end,
+						actors = "", 
+						poster = case Poster of
+											 	null -> "";
+											 	_ -> string:concat(PosterBaseUri, Poster)
+										 end, 
+						rating = Rating}
 		|| {struct,[_Adult, _Backdrop, _Id, _OriginalTitle,
 					{_, ReleaseDate}, {_, Poster}, _Popularity,
 					{_, Title}, {_, Rating}, _Votes]} 

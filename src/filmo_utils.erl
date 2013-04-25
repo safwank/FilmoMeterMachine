@@ -20,28 +20,25 @@ round_rating(Rating) ->
 
 filter_list(Pattern, List) ->
 	Eval = fun(S) -> 
-		   	   {ok, T, _} = erl_scan:string(S), 
-		   	   {ok, [A]} = erl_parse:parse_exprs(T), 
-		   	   {value, V, _} = erl_eval:expr(A, []), V 
-		   end,
+			   	   {ok, T, _} = erl_scan:string(S), 
+			   	   {ok, [A]} = erl_parse:parse_exprs(T), 
+			   	   {value, V, _} = erl_eval:expr(A, []), V 
+			   end,
 	FilterGen = fun(X) -> 
-					Eval(lists:flatten(["fun(",X,")->true;(_)->false end."])) 
-				end,
+								Eval(lists:flatten(["fun(",X,")->true;(_)->false end."])) 
+							end,
 	lists:filter(FilterGen(Pattern), List).
 
 average([]) -> 0;
-average(Numbers) ->
-	average(Numbers, 0, 0).
+average(Numbers) -> average(Numbers, 0, 0).
 
-average([H|T], Length, Sum) ->
-    average(T, Length + 1, Sum + H);
-average([], Length, Sum) ->
-    Sum / Length.
+average([H|T], Length, Sum) -> average(T, Length + 1, Sum + H);
+average([], Length, Sum) -> Sum / Length.
 
 movie_to_proplist(#movie{} = Movie) ->
-    [{K, element(I, Movie)} || {K, I} 
-    	<- lists:zip(record_info(fields, movie), 
-    				 lists:seq(2, record_info(size, movie)))].
+	[{K, element(I, Movie)} || {K, I} 
+		<- lists:zip(record_info(fields, movie), 
+			 lists:seq(2, record_info(size, movie)))].
 
 
 

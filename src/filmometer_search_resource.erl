@@ -15,28 +15,28 @@ content_types_provided(ReqData, Context) ->
 	{[{"application/json", to_json}], ReqData, Context}.
 
 to_json(ReqData, Context) ->
-    Title = wrq:get_qs_value("title", ReqData),
-    Year = wrq:get_qs_value("year", ReqData),
-    Results = get_results_for([{"title", Title}, {"year", Year}]),
-    CombinedResult = combine_results(Results),
-    SerializedResult = serializer:serialize(CombinedResult, json),
-    {SerializedResult, ReqData, Context}.
+  Title = wrq:get_qs_value("title", ReqData),
+  Year = wrq:get_qs_value("year", ReqData),
+  Results = get_results_for([{"title", Title}, {"year", Year}]),
+  CombinedResult = combine_results(Results),
+  SerializedResult = serializer:serialize(CombinedResult, json),
+  {SerializedResult, ReqData, Context}.
 
 get_results_for(Criteria) ->
 	%% TODO: Figure out how to retrieve results from a dynamic list of sources
 	Pid = self(),
-    spawn(omdb_source, get_result, [Criteria, Pid]),
-    spawn(flixster_source, get_result, [Criteria, Pid]),
-    spawn(tmdb_source, get_result, [Criteria, Pid]),
-    Results = wait_for_responses(3, []),
-    Results.
+  spawn(omdb_source, get_result, [Criteria, Pid]),
+  spawn(flixster_source, get_result, [Criteria, Pid]),
+  spawn(tmdb_source, get_result, [Criteria, Pid]),
+  Results = wait_for_responses(3, []),
+  Results.
 
 wait_for_responses(0, Results) -> Results;
 wait_for_responses(Count, Results) ->
 	receive
 		Result -> wait_for_responses(Count-1, Results++Result)
 	after 
- 		30000 -> timeout 
+ 		30000 -> timeout %% TODO: store these in config/env variable
  	end.
 
 combine_results(Results) ->
@@ -49,42 +49,41 @@ combine_results(Results) ->
 
 combine_results([], _, CombinedResults) -> CombinedResults;
 combine_results([H|T], AllResults, CombinedResults) ->
+	%% TODO: remove duplicates
 	AuthoritativeSource = H,
 	ReferenceTitle = AuthoritativeSource#movie.title,
 	ReferenceYear = AuthoritativeSource#movie.year,
 	FilterFun = fun(M, Title, Year) ->
-					(M#movie.title =:= Title) andalso (M#movie.year =:= Year)
-				end,
+								(M#movie.title =:= Title) andalso (M#movie.year =:= Year)
+							end,
 	FilteredResults = [M || M <- AllResults, FilterFun(M, ReferenceTitle, ReferenceYear)],
 
 	Ratings = [M#movie.rating || M <- FilteredResults, M#movie.rating > 0],
-    AverageRating = filmo_utils:round_rating(filmo_utils:average(Ratings)),
-    Verdict = get_verdict_for(AverageRating),
+  AverageRating = filmo_utils:round_rating(filmo_utils:average(Ratings)),
+  Verdict = get_verdict_for(AverageRating),
 
-    NonEmptyActorsFun = fun(M) -> M#movie.actors =/= [] end,
-    Actors = lists:nth(1, [M#movie.actors || M <- FilteredResults, NonEmptyActorsFun(M)]),
+  NonEmptyActorsFun = fun(M) -> M#movie.actors =/= [] end,
+  Actors = lists:nth(1, [M#movie.actors || M <- FilteredResults, NonEmptyActorsFun(M)]),
 
-    %% Heroku doesn't like images from OMDB for some reason, so default to the first non-empty poster
-    PosterFun = fun(M) -> M#movie.source =/= "OMDB" andalso M#movie.source =/= [] end,
+  %% Heroku doesn't like images from OMDB for some reason, so default to the first non-empty poster
+  PosterFun = fun(M) -> M#movie.source =/= "OMDB" andalso M#movie.source =/= [] end,
 	NonOMDBPosters = [M#movie.poster || M <- FilteredResults, PosterFun(M)],
-    Poster = if
-		    	length(NonOMDBPosters) =:= 0 ->
-		    		"/img/no_result.jpg";
-		    	true ->
-		    		lists:nth(1, NonOMDBPosters)
-		     end,
+  Poster = if
+					   length(NonOMDBPosters) =:= 0 -> "/img/no_result.jpg";
+			    	 true -> lists:nth(1, NonOMDBPosters)
+			     end,
 
 	Genre = AuthoritativeSource#movie.genre,
 	Plot = AuthoritativeSource#movie.plot,
     
-    ConvertedResults = [{struct, filmo_utils:movie_to_proplist(Movie)} || Movie <- FilteredResults],
-    Result = {struct, [{"averageRating", AverageRating}, 
-		    		   {"actors", Actors},
-				       {"verdict", Verdict},
-				       {"poster", Poster},
-				       {"genre", Genre},
-				       {"plot", Plot},
-					   {"ratings", {array, ConvertedResults}}]},
+  ConvertedResults = [{struct, filmo_utils:movie_to_proplist(Movie)} || Movie <- FilteredResults],
+  Result = {struct, [{"averageRating", AverageRating}, 
+					    		   {"actors", Actors},
+							       {"verdict", Verdict},
+							       {"poster", Poster},
+							       {"genre", Genre},
+							       {"plot", Plot},
+								   	 {"ratings", {array, ConvertedResults}}]},
 	combine_results(T, AllResults, CombinedResults++[Result]).
 
 get_verdict_for(Score) ->

@@ -16,7 +16,7 @@ get_result(Criteria, Pid) ->
 	
 	RequestUri = lists:flatten(
 				 	io_lib:format("http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=~s&page_limit=~p&~s", 
-						          [APIKey, PageLimit, EncodedTitle])),
+          [APIKey, PageLimit, EncodedTitle])),
 	{ok, Result} = httpc:request(get, {RequestUri, []}, [], [{sync, true}]),
 
 	{{_Version, 200, _ReasonPhrase}, _Headers, Body} = Result,

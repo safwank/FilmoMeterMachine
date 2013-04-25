@@ -9,13 +9,12 @@
 -behaviour(application).
 -export([start/2,stop/1]).
 
-
 %% @spec start(_Type, _StartArgs) -> ServerRet
 %% @doc application start callback for filmometer.
 start(_Type, _StartArgs) ->
-    filmometer_sup:start_link().
+  filmometer_sup:start_link().
 
 %% @spec stop(_State) -> ServerRet
 %% @doc application stop callback for filmometer.
 stop(_State) ->
-    ok.
+  ok.
