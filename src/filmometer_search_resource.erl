@@ -49,7 +49,6 @@ combine_results(Results) ->
 
 combine_results([], _, CombinedResults) -> CombinedResults;
 combine_results([H|T], AllResults, CombinedResults) ->
-	%% TODO: remove duplicates
 	AuthoritativeSource = H,
 	ReferenceTitle = AuthoritativeSource#movie.title,
 	ReferenceYear = AuthoritativeSource#movie.year,
@@ -66,7 +65,9 @@ combine_results([H|T], AllResults, CombinedResults) ->
   Actors = lists:nth(1, [M#movie.actors || M <- FilteredResults, NonEmptyActorsFun(M)]),
 
   %% Heroku doesn't like images from OMDB for some reason, so default to the first non-empty poster
-  PosterFun = fun(M) -> M#movie.source =/= "OMDB" andalso M#movie.source =/= [] end,
+  PosterFun = fun(M) -> 
+  							M#movie.source =/= "OMDB" andalso M#movie.source =/= [] 
+  						end,
 	NonOMDBPosters = [M#movie.poster || M <- FilteredResults, PosterFun(M)],
   Poster = if
 					   length(NonOMDBPosters) =:= 0 -> "/img/no_result.jpg";

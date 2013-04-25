@@ -27,9 +27,12 @@ get_result(Criteria, Pid) ->
   case ParsedSearchResults of
   	{struct, [{_, _Response}, {_, _Error}]} -> 
   		Pid ! [];
-  	ParsedSearchResults ->
-  		{struct, [{_, {array, Results}}]} = ParsedSearchResults,
-  		Movies = get_all_movie_details(Results),
+  	{struct, [{_, {array, Results}}]} ->
+  		MovieFun = fun ({struct, R}) ->
+  									proplists:get_value("Type", R) =:= "movie" 
+  							 end,
+  		MovieResults = [R || R <- Results, MovieFun(R)],
+  		Movies = get_all_movie_details(MovieResults),
   		Pid ! Movies
   end.
 
