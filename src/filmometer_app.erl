@@ -7,7 +7,7 @@
 -author('author <author@example.com>').
 
 -behaviour(application).
--export([start/2,stop/1]).
+-export([start/2, stop/1]).
 
 %% @spec start(_Type, _StartArgs) -> ServerRet
 %% @doc application start callback for filmometer.

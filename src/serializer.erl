@@ -8,15 +8,15 @@
 -include_lib("webmachine/include/webmachine.hrl").
 
 serialize(Content, Type) ->
-	case Type of
-		json -> mochijson:encode(Content);
-		_ -> mochijson:encode(Content)
-	end.
+  case Type of
+    json -> mochijson:encode(Content);
+    _ -> mochijson:encode(Content)
+  end.
 
 deserialize(Content, Type) ->
-	case Type of
-		json -> mochijson:decode(Content);
-		_ -> mochijson:decode(Content)
-	end.
+  case Type of
+    json -> mochijson:decode(Content);
+    _ -> mochijson:decode(Content)
+  end.
 
 

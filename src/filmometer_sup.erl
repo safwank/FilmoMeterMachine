@@ -28,11 +28,11 @@ upgrade() ->
   New = sets:from_list([Name || {Name, _, _, _, _, _} <- Specs]),
   Kill = sets:subtract(Old, New),
 
-  sets:fold(fun (Id, ok) ->
-              supervisor:terminate_child(?MODULE, Id),
-              supervisor:delete_child(?MODULE, Id),
-              ok
-            end, ok, Kill),
+  sets:fold(fun(Id, ok) ->
+    supervisor:terminate_child(?MODULE, Id),
+    supervisor:delete_child(?MODULE, Id),
+    ok
+  end, ok, Kill),
 
   [supervisor:start_child(?MODULE, Spec) || Spec <- Specs],
   ok.
@@ -43,21 +43,21 @@ init([]) ->
   Ip = get_ip_address(),
   Port = get_port_number(),
   {ok, Dispatch} = file:consult(filename:join(
-                        [filename:dirname(code:which(?MODULE)),
-                        "..", "priv", "dispatch.conf"])),
+    [filename:dirname(code:which(?MODULE)),
+      "..", "priv", "dispatch.conf"])),
   WebConfig = [{ip, Ip},
-               {port, Port},
-               %{log_dir, "priv/log"},
-               {dispatch, Dispatch}],
+    {port, Port},
+%{log_dir, "priv/log"},
+    {dispatch, Dispatch}],
   Web = {webmachine_mochiweb,
-         {webmachine_mochiweb, start, [WebConfig]},
-         permanent, 5000, worker, [mochiweb_socket_server]},
+    {webmachine_mochiweb, start, [WebConfig]},
+    permanent, 5000, worker, [mochiweb_socket_server]},
   Processes = [Web],
-  {ok, { {one_for_one, 10, 10}, Processes} }.
+  {ok, {{one_for_one, 10, 10}, Processes}}.
 
 get_ip_address() ->
-  case os:getenv("WEBMACHINE_IP") of 
-    false -> "0.0.0.0"; 
+  case os:getenv("WEBMACHINE_IP") of
+    false -> "0.0.0.0";
     AnyIp -> AnyIp
   end.
 
