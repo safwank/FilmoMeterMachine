@@ -61,8 +61,9 @@ request_movie_details(MovieID, Pid) ->
     {struct, [{_, _Response}, {_, _Error}]} -> Pid ! [];
     ParsedResult ->
       {_, [{_, Title}, {_, Year}, _Rated, _Released, _Runtime, {_, Genre},
-        _Director, _Writer, {_, Actors}, {_, Plot}, {_, Poster}, {_, Rating},
-        _Votes, _ID, _Type, _Response]} = ParsedResult,
+        _Director, _Writer, {_, Actors}, {_, Plot}, _Language, _Country, 
+        _Awards, {_, Poster}, _Metascore, {_, Rating}, _Votes, _ID, _Type, 
+        _Response]} = ParsedResult,
 
       {ConvertedYear, _} = string:to_integer(Year),
       ConvertedRating = case string:to_float(Rating) of
